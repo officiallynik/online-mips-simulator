@@ -1,0 +1,17 @@
+.monaco-scrollable-element{
+    text-align: initial;
+}
+
+.react-monaco-editor-container{
+    width: 80%;
+}
+
+.console{
+    width: 100%;
+    padding-top: 2px;
+    background-color: gray
+}
+
+.console-screen{
+    margin-left: 5px;
+}

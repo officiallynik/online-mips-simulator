@@ -1,0 +1,59 @@
+.navbar.navbar-expand-sm.bg-light{
+    padding-top: 0% !important;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.nav-item{
+    display: inline;
+    padding-left: 5px;
+}
+
+.options{
+    display: flex;
+    flex-direction: row;
+}
+
+.bg-light{
+    background-color: #13152e !important;
+}
+
+.nav-link{
+    color: white;
+    opacity: 0.6;
+}
+
+#upload{
+    display: flex;
+    flex-direction: row;
+    float: left;
+}
+.nav-link:hover{
+    color: white;
+    opacity: 1;
+}
+
+input{
+    color: white;
+}
+
+div {
+    position: relative;
+    overflow: hidden;
+  }
+  input {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0;
+    right: 0;
+    top: 0;
+  }
+
+  .brand{
+    font-size: 20px;
+    font-family: sans-serif;
+    color: white;
+    font-weight: 500;
+  }

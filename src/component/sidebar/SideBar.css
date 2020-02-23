@@ -1,0 +1,18 @@
+.sidebar{
+    background-color: black;
+    width: 20%;
+    margin-left: 8px;
+    text-align: center;
+}
+
+.register{
+    color: white;
+    font-size: 14px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    height: 28.7px;
+}
+
+.register:nth-child(even){
+    background-color: #13152e;
+}
