@@ -3,6 +3,7 @@ var processor = {
     memory: new Array(1024*4).fill(0),
     instrLabels: {},
     dataLables: {},
+    // wordAddr: [],
 
     registers: new Map(
         [

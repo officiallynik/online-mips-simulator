@@ -1,4 +1,4 @@
-import processor from "./operations";
+import processor from "./processor";
 
 var parser = {
   instruction: [],
