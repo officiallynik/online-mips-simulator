@@ -11,10 +11,12 @@ import processor from './mips/operations'
 
 class App extends Component{
 
-  state={
+  state = {
     instructions: null,
     registers: processor.registers,
-    pc: 0
+    pc: 0,
+    print: "//console...\n",
+    clicked: "registers",
   }
 
   setFile = async (event)=>{
@@ -60,6 +62,9 @@ class App extends Component{
     console.log(parser.pointer)
     console.log(processor.pc)
     console.log(processor.memory)
+    this.setState({
+      print: this.state.print + "Successfully Assembled...\n"
+    })
   }
 
   execute = () => {
@@ -68,6 +73,9 @@ class App extends Component{
     const run = window.setInterval(() => {
       if(!processor.running){
         console.log("END OF INSTRUCTIONS")
+        this.setState({
+          print: this.state.print + "\nEnd of Instructions..."
+        })
         window.clearInterval(run)
         return
       }
@@ -84,6 +92,23 @@ class App extends Component{
       return
     }
 
+    if(this.state.instructions[processor.pc][0] === "syscall"){
+      const regV0 = processor.getRegister("v0")
+      // console.log("SYSCALLING", regV0)
+
+      //printing logic
+      if(regV0 === 1){
+        const regA0 = processor.getRegister("a0")
+        // console.log("getting a0", regA0)
+        
+        this.setState({
+          ...this.state,
+          print: this.state.print + regA0 + " "
+        })
+
+      }
+    }
+
     processor.execute(this.state.instructions[processor.pc])
 
     this.setState({
@@ -98,12 +123,22 @@ class App extends Component{
     processor.pc += 1
   }
 
+  onSideNavClick = (event) => {
+    this.setState({
+      clicked: event
+    })
+  }
+
   render=()=>{
     return(
       <div className="App">
         <SideBar 
           registers = {this.state.registers}
           pc = {this.state.pc}
+          clicked = {this.state.clicked}
+          onNavClick = {this.onSideNavClick}
+          dataSegment = {processor.memory}
+          memoryUsed = {parser.memPtr}
         />
         <div style={{width: '100%'}}>
           <Navbar 
@@ -114,7 +149,9 @@ class App extends Component{
             stepRun = {this.stepRun}
           />
           <IDE/>
-          <Console />
+          <Console
+            console = {this.state.print}
+          />
         </div>
       </div>
     )

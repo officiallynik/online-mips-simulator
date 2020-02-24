@@ -4,7 +4,8 @@ var parser = {
   instruction: [],
   pointer: new Map(),
   dataAddr: new Map(),
-  ptrArray: []
+  ptrArray: [],
+  memPtr: 0
 };
 
 parser.parse = code => {
@@ -24,14 +25,14 @@ parser.parse = code => {
     }
   });
 
-  var memPtr = 0;
+  parser.memPtr = 0;
 
   lineWiseSplit.forEach((line, idx) => {
     if (line[1] === "text") {
       return;
     }
     if (line[1] === "word") {
-      parser.dataAddr[parser.ptrArray[memPtr]] = memPtr;
+      parser.dataAddr[parser.ptrArray[parser.memPtr]] = parser.memPtr;
       line.forEach((word, idx) => {
         if (idx > 1) {
           // each val is of size 32 bits
@@ -41,12 +42,12 @@ parser.parse = code => {
             val = "0" + val;
           }
           // console.log(val)
-          processor.memory[memPtr] = val.slice(0, 8);
-          processor.memory[memPtr + 1] = val.slice(8, 16);
-          processor.memory[memPtr + 2] = val.slice(16, 24);
-          processor.memory[memPtr + 3] = val.slice(24, 32);
+          processor.memory[parser.memPtr] = val.slice(0, 8);
+          processor.memory[parser.memPtr + 1] = val.slice(8, 16);
+          processor.memory[parser.memPtr + 2] = val.slice(16, 24);
+          processor.memory[parser.memPtr + 3] = val.slice(24, 32);
 
-          memPtr += 4;
+          parser.memPtr += 4;
         }
       });
     }
