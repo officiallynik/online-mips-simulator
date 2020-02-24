@@ -9,6 +9,8 @@ import SideBar from './component/sidebar/SideBar'
 import parser from './mips/parser'
 import processor from './mips/operations'
 
+import { bubbleSort, sumOfNum } from './samplePrograms'
+
 class App extends Component{
 
   state = {
@@ -19,7 +21,7 @@ class App extends Component{
     clicked: "registers",
   }
 
-  setFile = async (event)=>{
+  setFile = async (event) => {
     let file = event.target.files[0];
     //creating a reader object
     var reader = new FileReader();
@@ -27,7 +29,7 @@ class App extends Component{
     var x = this;
     reader.onload = function() {
         console.log(reader.result);
-         localStorage.setItem('result',String(reader.result));
+         localStorage.setItem('result', String(reader.result));
          window.location.reload();
         //  x.showUploadAlert();
         //  setTimeout(this.showUploadAlert,5000);
@@ -140,6 +142,16 @@ class App extends Component{
     })
   }
 
+  onSampleProgramClick = program =>{
+    if(program === "bubbleSort"){
+      localStorage.setItem('result', bubbleSort);
+    }
+    else{
+      localStorage.setItem('result', sumOfNum)
+    }
+    window.location.reload();
+  }
+
   render=()=>{
     return(
       <div className="App">
@@ -158,6 +170,7 @@ class App extends Component{
             assemble = {this.assemble} 
             execute = {this.execute}
             stepRun = {this.stepRun}
+            sampleProgram = {this.onSampleProgramClick}
           />
           <IDE
             pc = {this.state.pc}

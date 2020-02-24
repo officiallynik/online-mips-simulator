@@ -28,8 +28,8 @@ class Navbar extends React.Component{
                                 Sample Programs
                             </a>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a className="dropdown-item" href="#">Bubble Sort</a>
-                                <a className="dropdown-item" href="#">Sum of first 10 natural numbers</a>
+                                <a className="dropdown-item" href="#" onClick={() => {this.props.sampleProgram("bubbleSort")}}>Bubble Sort</a>
+                                <a className="dropdown-item" href="#" onClick={() => {this.props.sampleProgram("sumOfNums")}}>Sum of first 10 natural numbers</a>
                             </div>
                         </li>
 
