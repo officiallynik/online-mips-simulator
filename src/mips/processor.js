@@ -61,6 +61,7 @@ processor.reset = () => {
     processor.dataLables = {}
     processor.instrLabels = {}
     processor.pc = 0
+    processor.setRegister("sp", 1024*4)
 }
 
 export default processor

@@ -12,7 +12,9 @@ import processor from './mips/operations'
 class App extends Component{
 
   state={
-    instructions: null
+    instructions: null,
+    registers: processor.registers,
+    pc: 0
   }
 
   setFile = async (event)=>{
@@ -84,17 +86,25 @@ class App extends Component{
 
     processor.execute(this.state.instructions[processor.pc])
 
+    this.setState({
+      ...this.state,
+      registers: processor.registers,
+      pc: processor.pc
+    })
+
     console.log(processor.registers)
     console.log(processor.memory)
 
     processor.pc += 1
   }
 
-
   render=()=>{
     return(
       <div className="App">
-        <SideBar />
+        <SideBar 
+          registers = {this.state.registers}
+          pc = {this.state.pc}
+        />
         <div style={{width: '100%'}}>
           <Navbar 
             setFile = {this.setFile} 
