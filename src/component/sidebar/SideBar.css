@@ -2,7 +2,6 @@
     background-color: black;
     width: 20%;
     margin-left: 8px;
-    text-align: center;
 }
 
 .register{
@@ -15,4 +14,18 @@
 
 .register:nth-child(even){
     background-color: #13152e;
+}
+
+.register_no{
+    padding-left: 30px;
+    float: left;
+}
+
+.register_val{
+    float: right;
+    padding-right: 30px;
+}
+
+.register_name{
+    padding-left: 40px;
 }

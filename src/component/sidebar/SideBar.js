@@ -2,72 +2,34 @@ import React from "react";
 
 import "./SideBar.css";
 const SideBar = props => {
-  var registers = [
-    {name : "$zero",val: 0},
-    { name: "$at", val: 0 },
-    { name: "$v0", val: 0 },
-    { name: "$v1", val: 0 },
-    { name: "$a0", val: 0 },
-    { name: "$a1", val: 0 },
-    { name: "$a2", val: 0 },
-    { name: "$a3", val: 0 },
-    { name: "$t0", val: 0 },
-    { name: "$t1", val: 0 },
-    { name: "$t2", val: 0 },
-    { name: "$t3", val: 0 },
-    { name: "$t4", val: 0 },
-    { name: "$t5", val: 0 },
-    { name: "$t6", val: 0 },
-    { name: "$t7", val: 0 },
-    { name: "$s0", val: 0 },
-    { name: "$s1", val: 0 },
-    { name: "$s2", val: 0 },
-    { name: "$s3", val: 0 },
-    { name: "$s4", val: 0 },
-    { name: "$s5", val: 0 },
-    { name: "$s6", val: 0 },
-    { name: "$s7", val: 0 },
-    { name: "$t8", val: 0 },
-    { name: "$t9", val: 0 },
-    { name: "$k0", val: 0 },
-    { name: "$k1", val: 0 },
-    { name: "$gp", val: 0 },
-    { name: "$sp", val: 0 },
-    { name: "$s8", val: 0 },
-    { name: "$ra", val: 0 },
-    // { name: "zero", val: 0 }
-  ];
+  // console.log(props.registers)
+  var registers = []
+    props.registers.forEach((val, key) => {
+      registers.push({
+        name: key,
+        val: val
+      })
+    });
   return (
     <div className="sidebar">
       <div>
         <div className="register" style={{ height: "50px" }}>
-          PC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-          &nbsp;&nbsp;&nbsp;{props.pc}
+          <span className="register_no">PC = </span> <span className="register_val">{props.pc}</span>
         </div>
-        {
-        // var registerArray = [];
-        props.registers.map((ele,idx) => {
-          console.log("inside props.registers")
-          console.log(`ele is ${ele}`);
-          console.log(`idx is ${idx}`);
-          // console.log(`key is ${key}`);
-          // const { name, val } = ele;
-          // if (idx < 10) {
-            // (
-              return (
-                <div className="register">
-                R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[
-                ${idx}] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= &nbsp;&nbsp;&nbsp;{ele}
+        {registers.map((ele, idx) => {
+          const { name, val } = ele;
+          if(idx<10){
+            return (
+              <div className="register" key={idx}>
+                <span className="register_no">R{idx}</span>&nbsp;&nbsp;<span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
               </div>
-              )
-            // );
-          // }
-          // return (
-          //   <div className="register">
-          //     R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[{name}]
-          //     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= &nbsp;&nbsp;&nbsp;{val}
-          //   </div>
-          // );
+            );
+          }
+          return (
+            <div className="register" key={idx}>
+              <span className="register_no">R{idx}</span> <span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
+            </div>
+          );
         })}
       </div>
       <div></div>
