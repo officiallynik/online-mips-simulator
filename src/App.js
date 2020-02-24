@@ -48,6 +48,10 @@ class App extends Component{
 
     var textArea = localStorage.getItem("result")
     // console.log(textArea)
+    if(textArea === null){
+      alert("Upload or write assembly code first!")
+      return
+    }
     this.setState({
       instructions: parser.parse(textArea)
     })
@@ -68,7 +72,10 @@ class App extends Component{
   }
 
   execute = () => {
-    if(!this.state.instructions) return;
+    if(!this.state.instructions){
+      alert("Assemble your code first!")
+      return
+    }
 
     const run = window.setInterval(() => {
       if(!processor.running){
@@ -86,7 +93,10 @@ class App extends Component{
   stepRun = () => {
     console.clear()
     console.log("PC = " + processor.pc)
-    if(!this.state.instructions) return;
+    if(!this.state.instructions){
+      alert("Assemble your code first!")
+      return
+    }
     if(!processor.running){
       console.log("END OF INSTRUCTIONS")
       return
