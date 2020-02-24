@@ -70,7 +70,7 @@ class App extends Component{
         return
       }
       this.stepRun()
-    }, 10)
+    }, 0)
   }
 
   stepRun = () => {
