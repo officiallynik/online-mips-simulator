@@ -28,7 +28,7 @@ class App extends Component{
     //reading file
     var x = this;
     reader.onload = function() {
-        console.log(reader.result);
+        // console.log(reader.result);
          localStorage.setItem('result', String(reader.result));
          window.location.reload();
         //  x.showUploadAlert();
@@ -64,10 +64,10 @@ class App extends Component{
     else{
       processor.running = false
     }
-    console.log("Assembled")
-    console.log(parser.pointer)
-    console.log(processor.pc)
-    console.log(processor.memory)
+    // console.log("Assembled")
+    // console.log(parser.pointer)
+    // console.log(processor.pc)
+    // console.log(processor.memory)
     this.setState({
       print: this.state.print + "Successfully Assembled...\n"
     })
@@ -81,7 +81,7 @@ class App extends Component{
 
     const run = window.setInterval(() => {
       if(!processor.running){
-        console.log("END OF INSTRUCTIONS")
+        // console.log("END OF INSTRUCTIONS")
         this.setState({
           print: this.state.print + "\nEnd of Instructions..."
         })
@@ -95,17 +95,38 @@ class App extends Component{
 
   stepRun = () => {
     console.clear()
-    console.log("PC = " + processor.pc)
+    // console.log("PC = " + processor.pc)
 
     if(!this.state.instructions){
       alert("Assemble your code first!")
       return
     }
+    
+    
     if(!processor.running){
-      console.log("END OF INSTRUCTIONS")
+      // console.log("END OF INSTRUCTIONS")
+      this.setState({
+        print: this.state.print + "\nEnd of Instructions..."
+      })
       return
     }
-
+    
+    
+    processor.execute(this.state.instructions[processor.pc])
+    
+    this.setState({
+      ...this.state,
+      registers: processor.registers,
+      pc: processor.pc
+    })
+    
+    // console.log(processor.registers)
+    // console.log(processor.memory)
+    this.setState({
+      instructions:this.state.instructions
+    })
+    processor.pc += 1
+    
     if(this.state.instructions[processor.pc][0] === "syscall"){
       const regV0 = processor.getRegister("v0")
       // console.log("SYSCALLING", regV0)
@@ -114,34 +135,18 @@ class App extends Component{
       if(regV0 === 1){
         const regA0 = processor.getRegister("a0")
         // console.log("getting a0", regA0)
+
+        const printNew = this.state.print + regA0 + " "
         
         this.setState({
-          ...this.state,
-          print: this.state.print + regA0 + " "
+          print: printNew
         })
-
       }
     }
-
-    processor.execute(this.state.instructions[processor.pc])
-
-    this.setState({
-      ...this.state,
-      registers: processor.registers,
-      pc: processor.pc
-    })
-
-    console.log(processor.registers)
-    console.log(processor.memory)
-    this.setState({
-      instructions:this.state.instructions
-    })
-    processor.pc += 1
-    
-    console.log("parser is");
-      console.log(parser);
-      console.log("processor is");
-      console.log(processor);
+    // console.log("parser is");
+      // console.log(parser);
+      // console.log("processor is");
+      // console.log(processor);
   }
 
   onSideNavClick = (event) => {

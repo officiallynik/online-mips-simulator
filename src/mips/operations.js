@@ -82,7 +82,7 @@ processor.operations = {
         const addr = parseInt(processor.getRegister(reg) + (offset * 4)) - 268500992
         const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
         const valDec = parseInt(val, 2)
-        console.log(addr, val, valDec)
+        // console.log(addr, val, valDec)
 
         processor.setRegister(dest, valDec)
     },
@@ -103,7 +103,7 @@ processor.operations = {
         for(let i=0; i<32-len; i++){
             val = "0" + val
         }
-        console.log(addr, val)
+        // console.log(addr, val)
 
         processor.memory[addr] = val.slice(0, 8)
         processor.memory[addr + 1] = val.slice(8, 16)
@@ -125,7 +125,7 @@ processor.operations = {
 }
 
 processor.execute = instruction => {
-    console.log(instruction)
+    // console.log(instruction)
     //arthemetic operations
     if(instruction[0] === "add"){
         const reg1 = instruction[2].split("$")[1]
@@ -160,7 +160,7 @@ processor.execute = instruction => {
         const offset = parseInt(instruction[2].split("(")[0])
         const reg = instruction[2].split("$")[1].split(")")[0]
 
-        console.log(dest, offset, reg)
+        // console.log(dest, offset, reg)
 
         return processor.operations.lw(dest, offset, reg)
     }

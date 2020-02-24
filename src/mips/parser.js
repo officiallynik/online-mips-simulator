@@ -14,7 +14,7 @@ parser.parse = code => {
   code.split("\n").forEach(line => {
     lineWiseSplit.push(line.trim().split(/[ ,.]+/));
   });
-  console.log(lineWiseSplit)
+  // console.log(lineWiseSplit)
 
   lineWiseSplit.forEach((line, idx) => {
     // console.log(line, line[0])
