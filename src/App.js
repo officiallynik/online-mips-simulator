@@ -48,7 +48,7 @@ class App extends Component{
 
     var textArea = localStorage.getItem("result")
     // console.log(textArea)
-    if(textArea === null){
+    if(textArea === null || textArea.length === 0){
       alert("Upload or write assembly code first!")
       return
     }
@@ -94,6 +94,7 @@ class App extends Component{
   stepRun = () => {
     console.clear()
     console.log("PC = " + processor.pc)
+
     if(!this.state.instructions){
       alert("Assemble your code first!")
       return
@@ -166,7 +167,9 @@ class App extends Component{
             execute = {this.execute}
             stepRun = {this.stepRun}
           />
-          <IDE/>
+          <IDE
+            pc = {this.state.pc}
+          />
           <Console
             console = {this.state.print}
           />

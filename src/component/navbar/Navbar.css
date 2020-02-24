@@ -25,10 +25,9 @@
     opacity: 0.6;
 }
 
-#upload{
+.upload{
     display: flex;
     flex-direction: row;
-    float: left;
 }
 .nav-link:hover{
     color: white;
@@ -56,4 +55,8 @@ div {
     font-family: sans-serif;
     color: white;
     font-weight: 500;
+  }
+
+  .dropdown{
+      margin-left: 100px;
   }
