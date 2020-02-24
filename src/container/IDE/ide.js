@@ -5,6 +5,8 @@ import 'brace/theme/monokai';
 
 import './ide.css'
 
+let markers = []
+
 class IDE extends Component {
 
   state = {
@@ -27,10 +29,20 @@ class IDE extends Component {
     // this.render();
   }
 
+  highLightLine = line => {
+    console.log("Line: " + line)
+    markers = []
+    markers.push({
+      startRow: line, 
+      endRow: line + 1,
+      className: 'replacement_marker', 
+      type: 'text' 
+    })
+  }
+
   render() {
-
-
-
+      // console.log(this.editor)
+      this.highLightLine(this.props.pc)
       return (
           <div className={"IDE-wrapper"}>
               <AceEditor
@@ -46,6 +58,7 @@ class IDE extends Component {
                   showPrintMargin={false}
                   value = {this.state.code}
                   onChange={this.onChange.bind(this)}
+                  markers = {markers}
               />
           </div>
       );

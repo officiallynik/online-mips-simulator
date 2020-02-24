@@ -5,3 +5,7 @@
 .IDE{
     margin-left: 5px;
 }
+
+.replacement_marker {
+    background-color: darkmagenta;
+ }
