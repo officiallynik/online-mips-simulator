@@ -11,9 +11,9 @@ parser.parse = code => {
   const lineWiseSplit = [];
 
   code.split("\n").forEach(line => {
-    lineWiseSplit.push(line.split(/[ ,.]+/));
+    lineWiseSplit.push(line.trim().split(/[ ,.]+/));
   });
-  // console.log(lineWiseSplit)
+  console.log(lineWiseSplit)
 
   lineWiseSplit.forEach((line, idx) => {
     // console.log(line, line[0])
@@ -51,6 +51,15 @@ parser.parse = code => {
       });
     }
   });
+
+  return lineWiseSplit
 };
+
+parser.reset = () => {
+  parser.instruction = []
+  parser.pointer = new Map()
+  parser.dataAddr = new Map()
+  parser.ptrArray = []
+}
 
 export default parser;

@@ -32,7 +32,7 @@ processor.operations = {
 
         var diff = regVal1 - regVal2
 
-        if(sum >= Math.pow(2, 31)){
+        if(diff >= Math.pow(2, 31)){
             console.log("Arthemetic Error")
             return
         }
@@ -83,7 +83,7 @@ processor.operations = {
         const val = processor.memory[addr - 1] + processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2]
         const valDec = val.toString(10)
 
-        console.log("VALDEC: " + valDec)
+        // console.log("VALDEC: " + valDec)
 
         processor.setRegister(dest, valDec)
     },
@@ -124,26 +124,27 @@ processor.operations = {
 }
 
 processor.execute = instruction => {
+    console.log(instruction)
     //arthemetic operations
     if(instruction[0] === "add"){
         const reg1 = instruction[2].split("$")[1]
         const reg2 = instruction[3].split("$")[1]
         const dest = instruction[1].split("$")[1]
 
-        processor.operations.add(dest, reg1, reg2)
+        return processor.operations.add(dest, reg1, reg2)
     }
     if(instruction[0] === "addi"){
         const reg = instruction[2].split("$")[1]
         const dest = instruction[1].split("$")[1]
 
-        processor.operations.addi(dest, reg, instruction[3])
+        return processor.operations.addi(dest, reg, instruction[3])
     }
     if(instruction[0] === "sub"){
         const reg1 = instruction[2].split("$")[1]
         const reg2 = instruction[3].split("$")[1]
         const dest = instruction[1].split("$")[1]
 
-        processor.operations.sub(dest, reg1, reg2)
+        return processor.operations.sub(dest, reg1, reg2)
     }
 
     //load operations
@@ -151,26 +152,26 @@ processor.execute = instruction => {
         const reg = instruction[1].split("$")[1]
         const addr = parser.pointer.get(instruction[2])
 
-        processor.operations.la(reg, addr)
+        return processor.operations.la(reg, addr)
     }
     if(instruction[0] === "lw"){
         const dest = instruction[1].split("$")[1]
         const offset = parseInt(instruction[2].split("(")[0])
         const reg = instruction[2].split("$")[1].split(")")[0]
 
-        processor.operations.lw(dest, offset, reg)
+        return processor.operations.lw(dest, offset, reg)
     }
     if(instruction[0] === "li"){
         const reg = instruction[1].split("$")[1]
         const val = parseInt(instruction[2])
 
-        processor.operations.li(reg, val)
+        return processor.operations.li(reg, val)
     }
     if(instruction[0] === "lui"){
         const reg = instruction[1].split("$")[1]
         const val = parseInt(instruction[2])
 
-        processor.operations.lui(reg, val)
+        return processor.operations.lui(reg, val)
     }
 
     //store operation
@@ -179,7 +180,7 @@ processor.execute = instruction => {
         const offset = parseInt(instruction[2].split("(")[0])
         const dest = instruction[2].split("$")[1].split(")")[0]
 
-        processor.operations.sw(reg, offset, dest)
+        return processor.operations.sw(reg, offset, dest)
     }
     
     //branch instructions
@@ -188,14 +189,14 @@ processor.execute = instruction => {
         const reg2 = instruction[2].split("$")[1]
         const label = parser.pointer.get(instruction[3])
 
-        processor.operations.beq(reg1, reg2, label)
+        return processor.operations.beq(reg1, reg2, label)
     }
     if(instruction[0] === "bne"){
         const reg1 = instruction[1].split("$")[1]
         const reg2 = instruction[2].split("$")[1]
         const label = parser.pointer.get(instruction[3])
 
-        processor.operations.bne(reg1, reg2, label)
+        return processor.operations.bne(reg1, reg2, label)
     }
 
     //compare operations
@@ -204,26 +205,26 @@ processor.execute = instruction => {
         const reg1 = instruction[2].split("$")[1]
         const reg2 = instruction[3].split("$")[1]
 
-        processor.operations.slt(dest, reg1, reg2)
+        return processor.operations.slt(dest, reg1, reg2)
     }
     if(instruction[0] === "slti"){
         const dest = instruction[1].split("$")[1]
         const reg = instruction[2].split("$")[1]
         const val = parseInt(instruction[3])
         
-        processor.operations.slti(dest, reg, val)
+        return processor.operations.slti(dest, reg, val)
     }
 
     //jump instructions
     if(instruction[0] === "j"){
         const label = parser.pointer.get(instruction[1])
 
-        processor.operations.j(label)
+        return processor.operations.j(label)
     }
     if(instruction[0] === "jr"){
         const reg = instruction[1].split("$")[1]
 
-        processor.operations.jr(reg)
+        return processor.operations.jr(reg)
     }
 }
 

@@ -51,4 +51,12 @@ processor.getRegister = (reg) => {
     return processor.registers.get(reg)
 }
 
+processor.reset = () => {
+    processor.running = true
+    processor.memory = new Array(1024*4).fill(0)
+    processor.dataLables = {}
+    processor.instrLabels = {}
+    processor.pc = 0
+}
+
 export default processor

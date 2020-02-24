@@ -17,16 +17,16 @@ class Navbar extends React.Component{
                                 {/* <a className="nav-link" href="#">Upload</a>
                                  */}
                                  
-                                    <div className="file btn btn-sm btn-primary"   >
+                                    <div className="file btn btn-sm btn-primary">
                                         Upload
-                                        <input type="file" name="file" id ="fileInput" accept=".asm" multiple/>
+                                        <input type="file" name="file" id ="fileInput" accept=".asm" onChange={this.props.setFile.bind(this)} multiple/>
                                     </div>
                             </div>
                             <div className="nav-item"> 
                                 {/* <a className="nav-link" href="#">Upload</a>
                                  */}
                                  
-                                    <div className="file btn btn-sm btn-warning" >
+                                    <div className="file btn btn-sm btn-warning" onClick={this.props.deleteFile.bind(this)} >
                                         Clear
                                     </div>
                             </div>
@@ -38,13 +38,13 @@ class Navbar extends React.Component{
 
                         <div className="options">
                             <div className="nav-item">
-                                    <a className="nav-link" href="#">Assemble</a>
+                                    <a className="nav-link" href="#" onClick={this.props.assemble}>Assemble</a>
                                 </div>
                                 <div className="nav-item">
-                                    <a className="nav-link" href="#">Run</a>
+                                    <a className="nav-link" href="#" onClick={this.props.execute}>Run</a>
                                 </div>
                                 <div className="nav-item">
-                                    <a className="nav-link" href="#">Step-Run</a>
+                                    <a className="nav-link" href="#" onClick={this.props.stepRun}>Step-Run</a>
                                 </div>
                         </div>
             </nav>
