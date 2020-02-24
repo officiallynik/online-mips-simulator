@@ -29,3 +29,12 @@
 .register_name{
     padding-left: 40px;
 }
+
+.sidebar-nav{
+    height: 48px;
+}
+
+.data-segment{
+    color: white;
+    padding-top: 20px;
+}

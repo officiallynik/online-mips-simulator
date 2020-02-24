@@ -22,10 +22,10 @@ const Console = props => {
             <div className="console"></div>
             <MonacoEditor
                 width="100%"
-                height="219"
+                height="265"
                 language="mips"
                 theme="vs-dark"
-                value="//Console..."
+                value= {props.console}
                 options={options}
                 onChange={onChange}
                 editorDidMount={editorDidMount}
