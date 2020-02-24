@@ -49,6 +49,10 @@ processor.setRegister = (reg, num) => {
 }
 
 processor.getRegister = (reg) => {
+    if(reg === "zero"){
+        console.log("getting zero")
+        return 0
+    }
     return processor.registers.get(reg)
 }
 

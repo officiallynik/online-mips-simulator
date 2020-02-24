@@ -70,7 +70,8 @@ class App extends Component{
         return
       }
       this.stepRun()
-    }, 10)
+      
+    }, 0)
   }
 
   stepRun = () => {
@@ -86,15 +87,22 @@ class App extends Component{
 
     console.log(processor.registers)
     console.log(processor.memory)
-
+    this.setState({
+      instructions:this.state.instructions
+    })
     processor.pc += 1
+    
+    console.log("parser is");
+      console.log(parser);
+      console.log("processor is");
+      console.log(processor);
   }
 
 
   render=()=>{
     return(
       <div className="App">
-        <SideBar />
+        <SideBar pc={processor.pc} registers = {processor.registers} />
         <div style={{width: '100%'}}>
           <Navbar 
             setFile = {this.setFile} 

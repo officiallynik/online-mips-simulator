@@ -79,11 +79,10 @@ processor.operations = {
         }
     },
     lw: (dest, offset, reg) => {
-        const addr = parseInt(processor.getRegister(reg)) + (offset * 4)
-        const val = processor.memory[addr-1] + processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2]
-        const valDec = val.toString(10)
-
-        // console.log("VALDEC: " + valDec)
+        const addr = parseInt(processor.getRegister(reg) + (offset * 4)) - 268500992
+        const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
+        const valDec = parseInt(val, 2)
+        console.log(addr, val, valDec)
 
         processor.setRegister(dest, valDec)
     },
@@ -98,17 +97,18 @@ processor.operations = {
         processor.setRegister(dest, val<<16)
     },
     sw: (reg, offset, dest) => {
-        const addr = parseInt(processor.getRegister(dest)) + (offset * 4)
+        const addr = parseInt(processor.getRegister(dest) + (offset * 4)) - 268500992
         var val = processor.getRegister(reg).toString(2)
         const len = val.length
         for(let i=0; i<32-len; i++){
             val = "0" + val
         }
-        
-        processor.memory[addr-1] = val.slice(0, 8)
-        processor.memory[addr] = val.slice(8, 16)
-        processor.memory[addr + 1] = val.slice(16, 24)
-        processor.memory[addr + 2] = val.slice(24, 32)
+        console.log(addr, val)
+
+        processor.memory[addr] = val.slice(0, 8)
+        processor.memory[addr + 1] = val.slice(8, 16)
+        processor.memory[addr + 2] = val.slice(16, 24)
+        processor.memory[addr + 3] = val.slice(24, 32)
 
         // processor.wordAddr.push(addr - 1)
     },
@@ -159,6 +159,8 @@ processor.execute = instruction => {
         const dest = instruction[1].split("$")[1]
         const offset = parseInt(instruction[2].split("(")[0])
         const reg = instruction[2].split("$")[1].split(")")[0]
+
+        console.log(dest, offset, reg)
 
         return processor.operations.lw(dest, offset, reg)
     }
