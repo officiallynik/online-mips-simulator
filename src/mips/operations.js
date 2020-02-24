@@ -80,7 +80,7 @@ processor.operations = {
     },
     lw: (dest, offset, reg) => {
         const addr = parseInt(processor.getRegister(reg)) + (offset * 4)
-        const val = processor.memory[addr - 1] + processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2]
+        const val = processor.memory[addr-1] + processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2]
         const valDec = val.toString(10)
 
         // console.log("VALDEC: " + valDec)
@@ -91,6 +91,7 @@ processor.operations = {
         processor.setRegister(dest, parseInt(val))
     },
     la: (dest, label) => {
+        // i think some mistake is their
         processor.setRegister(dest, label)
     },
     lui: (dest, val) => {
@@ -98,13 +99,13 @@ processor.operations = {
     },
     sw: (reg, offset, dest) => {
         const addr = parseInt(processor.getRegister(dest)) + (offset * 4)
-        const val = processor.getRegister(reg).toString(2)
+        var val = processor.getRegister(reg).toString(2)
         const len = val.length
         for(let i=0; i<32-len; i++){
             val = "0" + val
         }
         
-        processor.memory[addr - 1] = val.slice(0, 8)
+        processor.memory[addr-1] = val.slice(0, 8)
         processor.memory[addr] = val.slice(8, 16)
         processor.memory[addr + 1] = val.slice(16, 24)
         processor.memory[addr + 2] = val.slice(24, 32)
@@ -179,7 +180,8 @@ processor.execute = instruction => {
         const reg = instruction[1].split("$")[1]
         const offset = parseInt(instruction[2].split("(")[0])
         const dest = instruction[2].split("$")[1].split(")")[0]
-
+        // console.log(dest);
+        // alert(dest);
         return processor.operations.sw(reg, offset, dest)
     }
     
