@@ -90,6 +90,7 @@ processor.operations = {
         processor.setRegister(dest, parseInt(val))
     },
     la: (dest, label) => {
+        // i think some mistake is their
         processor.setRegister(dest, label)
     },
     lui: (dest, val) => {
@@ -181,7 +182,8 @@ processor.execute = instruction => {
         const reg = instruction[1].split("$")[1]
         const offset = parseInt(instruction[2].split("(")[0])
         const dest = instruction[2].split("$")[1].split(")")[0]
-
+        // console.log(dest);
+        // alert(dest);
         return processor.operations.sw(reg, offset, dest)
     }
     

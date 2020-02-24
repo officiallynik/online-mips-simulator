@@ -89,6 +89,7 @@ class App extends Component{
         return
       }
       this.stepRun()
+      
     }, 0)
   }
 
@@ -132,8 +133,15 @@ class App extends Component{
 
     console.log(processor.registers)
     console.log(processor.memory)
-
+    this.setState({
+      instructions:this.state.instructions
+    })
     processor.pc += 1
+    
+    console.log("parser is");
+      console.log(parser);
+      console.log("processor is");
+      console.log(processor);
   }
 
   onSideNavClick = (event) => {
