@@ -56,7 +56,7 @@ const SideBar = props => {
       {
         dataSegment.map((ele, idx) => {
           return (
-          <div id={idx} className="data-segment">{ele.dec}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{fontSize: "14px"}}>{ele.bin}</span></div>
+          <div id={idx} className="data-segment">{ele.dec}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{fontSize: "11px"}}>{ele.bin}</span></div>
           )
         })
       }
