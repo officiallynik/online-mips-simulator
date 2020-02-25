@@ -230,6 +230,11 @@ processor.execute = instruction => {
 
         return processor.operations.jr(reg)
     }
+    
+    if(instruction.length > 1){
+        alert("Operation not found: " + instruction)
+        processor.running = false
+    }
 }
 
 export default processor
