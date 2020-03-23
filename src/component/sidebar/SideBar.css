@@ -31,8 +31,9 @@
 }
 
 .data-segment{
-    color: white;
+    color: orange;
     padding-top: 20px;
+    padding-left: 10px;
 }
 
 .registers{
