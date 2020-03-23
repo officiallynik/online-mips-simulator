@@ -2,10 +2,6 @@
     width: 100%
 }
 
-.IDE{
-    margin-left: 5px;
-}
-
 .replacement_marker {
-    background-color: darkmagenta;
+    background-color: lightyellow
  }

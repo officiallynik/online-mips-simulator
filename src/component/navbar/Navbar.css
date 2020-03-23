@@ -1,44 +1,4 @@
-.navbar.navbar-expand-sm.bg-light{
-    padding-top: 0% !important;
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.nav-item{
-    display: inline;
-    padding-left: 5px;
-}
-
-.options{
-    display: flex;
-    flex-direction: row;
-}
-
-.bg-light{
-    background-color: #13152e !important;
-}
-
-.nav-link{
-    color: white;
-    opacity: 0.6;
-}
-
-.upload{
-    display: flex;
-    flex-direction: row;
-}
-.nav-link:hover{
-    color: white;
-    opacity: 1;
-}
-
-input{
-    color: white;
-}
-
-div {
+.upload {
     position: relative;
     overflow: hidden;
   }
@@ -49,14 +9,48 @@ div {
     right: 0;
     top: 0;
   }
+  
+.main-nav{
+    background-color: #3a3b3d;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 28px;
+}
 
-  .brand{
-    font-size: 20px;
-    font-family: sans-serif;
+.brand-icon{
+    display: inline;
+}
+
+.fa-microchip{
+    font-size: large;
+    color: skyblue;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.leftSide{
+    display: inline;
+}
+
+.nav-buttons{
     color: white;
-    font-weight: 500;
-  }
+    box-sizing: border-box;
+    opacity: 0.8;
+    display: inline;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 6px;
+    margin: 0;
+} 
+.nav-buttons:hover{
+    cursor: pointer;
+    background-color: #72757a;
+} 
 
-  .dropdown{
-      margin-left: 100px;
-  }
+.title{
+    color: white;
+    opacity: 0.8;
+    font-weight: 300;
+    font-size: 16px;
+}

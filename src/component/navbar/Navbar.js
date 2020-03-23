@@ -8,46 +8,53 @@ class Navbar extends React.Component{
         result: ""
     }
     render(){
-        return ( 
-            <nav className="navbar navbar-expand-sm bg-light">
-                        <div className = "upload">
-                            <div className="nav-item">
-                                    <div className="file btn btn-sm btn-primary">
-                                        Upload
-                                        <input type="file" name="file" id ="fileInput" accept=".asm" onChange={this.props.setFile.bind(this)} multiple/>
-                                    </div>
-                            </div>
-                            <div className="nav-item"> 
-                                    <div className="file btn btn-sm btn-warning" onClick={this.props.deleteFile.bind(this)} >
-                                        Clear
-                                    </div>
-                            </div>   
-                        </div>
-                        <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Sample Programs
-                            </a>
-                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a className="dropdown-item" href="#" onClick={() => {this.props.sampleProgram("bubbleSort")}}>Bubble Sort</a>
-                                <a className="dropdown-item" href="#" onClick={() => {this.props.sampleProgram("sumOfNums")}}>Sum of first 10 natural numbers</a>
-                            </div>
-                        </li>
+        return (
+            <nav className="main-nav">
+                <div className="leftSide">
+                    <div className="brand-icon">
+                        <i className="fas fa-microchip"></i>
+                    </div>
+                    <div className="nav-item nav-buttons upload">
+                        <span className="file">
+                            Upload
+                            <input type="file" name="file" id ="fileInput" accept=".asm" onChange={this.props.setFile.bind(this)} multiple/>
+                        </span>
+                    </div>
+                    <div className="nav-item nav-buttons"> 
+                        <span className="file" onClick={this.props.deleteFile.bind(this)} >
+                            Clear
+                        </span>
+                    </div>
 
-                        <div className="brand">
-                            MIPS SIMULATOR
-                        </div>
+                    <div className="nav-item nav-buttons" onClick={() => alert("Refer last option in Side Bar")}>
+                        <span>
+                            Sample Programs
+                        </span>
+                    </div>
 
-                        <div className="options">
-                            <div className="nav-item">
-                                    <a className="nav-link" href="#" onClick={this.props.assemble}>Assemble</a>
-                                </div>
-                                <div className="nav-item">
-                                    <a className="nav-link" href="#" onClick={this.props.execute}>Run</a>
-                                </div>
-                                <div className="nav-item">
-                                    <a className="nav-link" href="#" onClick={this.props.stepRun}>Step-Run</a>
-                                </div>
-                        </div>
+                    <div className="nav-item nav-buttons" onClick={() => alert("Help section will be available soon")}> 
+                        <span>
+                            Help
+                        </span>
+                    </div>
+
+                </div>
+
+                <div className="title" style={{display: 'inline'}}>
+                    Mips Simulator
+                </div>
+
+                <div className="rightSide" style={{display: 'inline'}}>
+                    <span className="nav-item  nav-buttons" onClick={this.props.assemble}>
+                        <span href="#" >Assemble</span>
+                    </span>
+                    <span className="nav-item  nav-buttons" onClick={this.props.execute}>
+                        <span href="#" >Run</span>
+                    </span>
+                    <span className="nav-item  nav-buttons" onClick={this.props.stepRun}>
+                         <span href="#" >Step-Run</span>
+                    </span>
+                </div>
             </nav>
         )
     }

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import AceEditor from "react-ace";
 import 'brace/mode/mips_assembler';
-import 'brace/theme/monokai';
+import 'brace/theme/tomorrow_night';
 
 import './ide.css'
 
-let markers = []
+let warning = []
 
 class IDE extends Component {
 
@@ -30,25 +30,24 @@ class IDE extends Component {
   }
 
   highLightLine = line => {
-    console.log("Line: " + line)
-    markers = []
-    markers.push({
-      startRow: line, 
-      endRow: line + 1,
-      className: 'replacement_marker', 
-      type: 'text' 
-    })
+    warning = [{
+      row: line, 
+      type: 'warning',
+      text: 'here'
+    }]
   }
 
   render() {
       // console.log(this.editor)
-      this.highLightLine(this.props.pc)
+      var lineNum = this.props.pc
+      this.highLightLine(lineNum)
+
       return (
           <div className={"IDE-wrapper"}>
               <AceEditor
                   className={"IDE"}
                   mode="mips_assembler" 
-                  theme="monokai"
+                  theme="tomorrow_night"
                   placeholder="//write assembly code here..."
                   fontSize={18} 
                   style={{width: "100%", height: "700px"}}
@@ -58,7 +57,7 @@ class IDE extends Component {
                   showPrintMargin={false}
                   value = {this.state.code}
                   onChange={this.onChange.bind(this)}
-                  markers = {markers}
+                  annotations = {warning}
               />
           </div>
       );

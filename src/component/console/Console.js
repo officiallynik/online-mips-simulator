@@ -1,38 +1,25 @@
 import React from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import './Console.css'
+import AceEditor from "react-ace";
+import 'brace/theme/tomorrow_night';
 
 const Console = props => {
-    function editorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
-        editor.focus();
-    }
-    
-    function onChange(newValue, e) {
-        console.log('onChange', newValue, e);
-    }
-
-    const options = {
-        selectOnLineNumbers: true,
-        textAlign:"initial"
-    };
-
     return (
-        <div className="console-screen">
-            <div className="console"></div>
-            <MonacoEditor
-                width="100%"
-                height="265"
-                language="mips"
-                theme="vs-dark"
-                value= {props.console}
-                options={options}
-                onChange={onChange}
-                editorDidMount={editorDidMount}
+        <div className={"console-wrapper"}>
+            <AceEditor
+                className={"console"}
+                theme="tomorrow_night"
+                fontSize={14} 
+                style={{width: "100%", height: "230px"}}
+                name="console" 
+                editorProps={{$blockScrolling: true}}
+                setOptions={{tabSize: 4, wrap: false}}
+                showPrintMargin={false}
+                value = {props.console}
+                readOnly
             />
-        </div>    
-        
-    )
+        </div>
+    );
 }
 
 export default Console

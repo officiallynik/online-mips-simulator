@@ -85,7 +85,7 @@ sum:
 
 .globl main
 main:
-    li $s0, 10
+    li $s0, 11
     li $s1, 0
     li $t0 ,1
     j sum   `

@@ -17,8 +17,9 @@ class App extends Component{
     instructions: null,
     registers: processor.registers,
     pc: 0,
-    print: "//console...\n",
+    print: "//console...read-only\n",
     clicked: "registers",
+    sampleProgramTriggered: false
   }
 
   setFile = async (event) => {
@@ -26,7 +27,6 @@ class App extends Component{
     //creating a reader object
     var reader = new FileReader();
     //reading file
-    var x = this;
     reader.onload = function() {
         // console.log(reader.result);
          localStorage.setItem('result', String(reader.result));
@@ -167,30 +167,37 @@ class App extends Component{
 
   render=()=>{
     return(
-      <div className="App">
-        <SideBar 
-          registers = {this.state.registers}
-          pc = {this.state.pc}
-          clicked = {this.state.clicked}
-          onNavClick = {this.onSideNavClick}
-          dataSegment = {processor.memory}
-          memoryUsed = {parser.memPtr}
-        />
-        <div style={{width: '100%'}}>
+      <div className="main-screen">
+        <div>
           <Navbar 
             setFile = {this.setFile} 
             deleteFile = {this.deleteFile} 
             assemble = {this.assemble} 
             execute = {this.execute}
             stepRun = {this.stepRun}
-            sampleProgram = {this.onSampleProgramClick}
           />
-          <IDE
-            pc = {this.state.pc}
-          />
-          <Console
-            console = {this.state.print}
-          />
+        </div>
+        <div className="App">
+          <div style={{width: '17%'}}>
+            <SideBar 
+              registers = {this.state.registers}
+              pc = {this.state.pc}
+              clicked = {this.state.clicked}
+              onNavClick = {this.onSideNavClick}
+              dataSegment = {processor.memory}
+              memoryUsed = {parser.memPtr}
+              sampleProgram = {this.onSampleProgramClick}
+            />
+          </div>
+          <div style={{width: '83%'}}>
+            <IDE
+              pc = {this.state.pc}
+            />
+            <div style={{height: '1px', backgroundColor: 'white'}}></div>
+            <Console
+              console = {this.state.print}
+            />
+          </div>
         </div>
       </div>
     )
