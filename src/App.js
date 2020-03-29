@@ -22,6 +22,7 @@ class App extends Component{
     sampleProgramTriggered: false
   }
 
+  // --- logic to upload and clear file ---
   setFile = async (event) => {
     let file = event.target.files[0];
     //creating a reader object
@@ -44,6 +45,7 @@ class App extends Component{
     // this.showCleanAlert();
   }
 
+  // --- assemble the code from file ---
   assemble = () => {
     processor.reset()
     parser.reset()
@@ -149,6 +151,8 @@ class App extends Component{
       // console.log(processor);
   }
 
+
+  // --- other dom logic ---
   onSideNavClick = (event) => {
     this.setState({
       clicked: event
