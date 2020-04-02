@@ -5,9 +5,12 @@ import processor from '../processor'
 const memory = instr => {
     console.log("MEM", instr)
     if(instr.operator === 'lw'){
-        const addr = parseInt(processor.getRegister(instr.src) + (instr.offset * 4)) - 268500992
+        console.log(instr)
+        const addr = parseInt((instr.src) + (instr.offset * 4)) - 268500992
         const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
         const valDec = parseInt(val, 2)
+
+        console.log(addr, val, valDec)
     
         processor.setRegister(instr.dest, valDec)
     }
@@ -20,7 +23,7 @@ const memory = instr => {
             processor.setRegister(instr.dest, instr.val<<16)
         }
     }
-    else {
+    else if(instr.operator === 'la'){
         processor.setRegister(instr.dest, instr.addr)
     }
 }

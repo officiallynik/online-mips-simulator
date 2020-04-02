@@ -8,6 +8,16 @@ class Navbar extends React.Component{
         result: ""
     }
     render(){
+        var runButton = ""
+        if(this.props.running === 1){
+            runButton = <span href="#" ><i class="fas fa-spinner" style={{color: "yellow"}}></i> Running</span>
+        }
+        else if(this.props.running === 2){
+            runButton = <span href="#" ><i class="fas fa-check" style={{color: '"yellow'}}></i> Done</span>
+        }
+        else{
+            runButton = <span href="#" ><i class="fas fa-play" style={{color: "yellow"}}></i> Run</span>
+        }
         return (
             <nav className="main-nav">
                 <div className="leftSide">
@@ -26,9 +36,9 @@ class Navbar extends React.Component{
                         </span>
                     </div>
 
-                    <div className="nav-item nav-buttons" onClick={() => alert("Refer last option in Side Bar")}>
+                    <div className="nav-item nav-buttons" onClick={() => this.props.toggleDF()} style={this.props.dataForw? {backgroundColor: "green"}: {}}> 
                         <span>
-                            Sample Programs
+                            Data Forward
                         </span>
                     </div>
 
@@ -49,7 +59,7 @@ class Navbar extends React.Component{
                         <span href="#" >Assemble</span>
                     </span>
                     <span className="nav-item  nav-buttons" onClick={this.props.execute}>
-                        <span href="#" >Run</span>
+                        {runButton}
                     </span>
                     <span className="nav-item  nav-buttons" onClick={this.props.stepRun}>
                          <span href="#" >Step-Run</span>

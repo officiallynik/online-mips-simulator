@@ -51,19 +51,22 @@ const SideBar = props => {
             <span className="register_no">PC = </span> <span className="register_val">{props.pc}</span>
           </div>
           {registers.map((ele, idx) => {
-            const { name, val } = ele;
-            if (idx < 10) {
+            if(idx < 32){ // temporary solution
+              const { name, val } = ele;
+              if (idx < 10) {
+                return (
+                  <div className="register" key={idx}>
+                    <span className="register_no">R{idx}</span>&nbsp;&nbsp;<span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
+                  </div>
+                );
+              }
               return (
                 <div className="register" key={idx}>
-                  <span className="register_no">R{idx}</span>&nbsp;&nbsp;<span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
+                  <span className="register_no">R{idx}</span> <span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
                 </div>
-              );
+              )
             }
-            return (
-              <div className="register" key={idx}>
-                <span className="register_no">R{idx}</span> <span className="register_name">[{name}]</span> = <span className="register_val">{val}</span>
-              </div>
-            );
+            return null
           })}
         </div>
       </div>

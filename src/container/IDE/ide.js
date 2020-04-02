@@ -58,6 +58,7 @@ class IDE extends Component {
                   value = {this.state.code}
                   onChange={this.onChange.bind(this)}
                   annotations = {warning}
+                  enableBasicAutocompletion
               />
           </div>
       );

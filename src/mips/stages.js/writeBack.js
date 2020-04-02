@@ -3,7 +3,8 @@ import processor from '../processor'
 
 const writeBack = instr => {
     console.log("WB", instr)
-    if(instr.result){
+    if(instr["result"] !== undefined && instr["dest"] !== undefined){ 
+        console.log(instr.dest, instr.result)
         processor.setRegister(instr.dest, instr.result)
     }
     if(instr.operator === 'sw'){
@@ -18,6 +19,9 @@ const writeBack = instr => {
         processor.memory[addr + 1] = val.slice(8, 16)
         processor.memory[addr + 2] = val.slice(16, 24)
         processor.memory[addr + 3] = val.slice(24, 32)
+    }
+    if(instr.operator === "jr"){
+        processor.running = false
     }
     instr.completed = true
 

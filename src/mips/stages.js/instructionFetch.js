@@ -98,6 +98,14 @@ const fetchInstruction = (pc, instructions) => {
             completed: false
         }
     }
+    else if(instructions[pc][0] === "syscall"){
+        processor.pc += 1
+        return {
+            operator: instructions[pc][0],
+            src: "a0",
+            completed: false
+        }
+    }
     else{
         if(instructions[pc].length > 1){
             alert("Operation not found: " + instructions[pc][0])
