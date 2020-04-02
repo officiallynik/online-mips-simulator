@@ -10,95 +10,102 @@ const r3Types = ['add', 'sub', 'slt'],
       sTypes = ['sw']
 
 const fetchInstruction = (pc, instructions) => {
-    if(r3Types.indexOf(instructions[pc-1][0]) >= 0){
+    console.log("IF", pc, instructions[pc])
+    if(r3Types.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
-            operator: instructions[pc-1][0],
-            dest: instructions[pc-1][1].split("$")[1],
-            src1: instructions[pc-1][2].split("$")[1],
-            src2: instructions[pc-1][3].split("$")[1],
+            operator: instructions[pc][0],
+            dest: instructions[pc][1].split("$")[1],
+            src1: instructions[pc][2].split("$")[1],
+            src2: instructions[pc][3].split("$")[1],
             completed: false
         }
     }
-    else if(r2Types.indexOf(instructions[pc-1][0]) >= 0){
+    else if(r2Types.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
-            operator: instructions[pc-1][0],
-            dest: instructions[pc-1][1].split("$")[1],
-            src1: instructions[pc-1][2].split("$")[1],
-            val: instructions[pc-1][3],
+            operator: instructions[pc][0],
+            dest: instructions[pc][1].split("$")[1],
+            src1: instructions[pc][2].split("$")[1],
+            val: instructions[pc][3],
             completed: false
         }
     }
-    else if(bTypes.indexOf(instructions[pc-1][0]) >= 0){
+    else if(bTypes.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
-            operator: instructions[pc-1][0],
-            src1: instructions[pc-1][1].split("$")[1],
-            src2: instructions[pc-1][2].split("$")[1],
-            label: parser.pointer.get(instructions[pc-1][3]),
+            operator: instructions[pc][0],
+            src1: instructions[pc][1].split("$")[1],
+            src2: instructions[pc][2].split("$")[1],
+            label: parser.pointer.get(instructions[pc][3]),
             completed: false
         }
     }
-    else if(wTypes.indexOf(instructions[pc-1][0]) >= 0){
+    else if(wTypes.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
-        if(instructions[pc-1][0] === 'lw'){
+        if(instructions[pc][0] === 'lw'){
             return {
-                operator: instructions[pc-1][0],
-                dest: instructions[pc-1][1].split("$")[1],
-                src: instructions[pc-1][2].split("$")[1].split(")")[0],
-                offset: parseInt(instructions[pc-1][2].split("(")[0]),
+                operator: instructions[pc][0],
+                dest: instructions[pc][1].split("$")[1],
+                src: instructions[pc][2].split("$")[1].split(")")[0],
+                offset: parseInt(instructions[pc][2].split("(")[0]),
                 completed: false
             }
         }
-        else if(instructions[pc-1][0] === 'li' || instructions[pc-1][0] === 'lui'){
+        else if(instructions[pc][0] === 'li' || instructions[pc][0] === 'lui'){
             return {
-                operator: instructions[pc-1][0],
-                dest: instructions[pc-1][1].split("$")[1],
-                val: parseInt(instructions[pc-1][2]),
+                operator: instructions[pc][0],
+                dest: instructions[pc][1].split("$")[1],
+                val: parseInt(instructions[pc][2]),
                 completed: false
             }
         }
         else {
             return {
-                operator: instructions[pc-1][0],
-                dest: instructions[pc-1][1].split("$")[1],
-                addr: parser.pointer.get(instructions[pc-1][2]),
+                operator: instructions[pc][0],
+                dest: instructions[pc][1].split("$")[1],
+                addr: parser.pointer.get(instructions[pc][2]),
                 completed: false
             }
         }
     }
-    else if(jTypes.indexOf(instructions[pc-1][0]) >= 0){
-        processor.pc += 1
-        if(instructions[pc-1][0] === 'j'){
+    else if(jTypes.indexOf(instructions[pc][0]) >= 0){
+        if(instructions[pc][0] === 'j'){
+            processor.pc = parser.pointer.get(instructions[pc][1])
             return {
-                operator: instructions[pc-1][0],
-                label: parser.pointer.get(instructions[pc-1][1]),
+                operator: instructions[pc][0],
+                label: parser.pointer.get(instructions[pc][1]),
                 completed: false
             }
         }
         else {
+            // processor.pc = parseInt(processor.getRegister(instructions[pc][1].split("$")[1]))
+            processor.endOfInstr = true 
             return {
-                operator: instructions[pc-1][0],
-                src: instructions[pc-1][1].split("$")[1],
+                operator: instructions[pc][0],
+                src: instructions[pc][1].split("$")[1],
                 completed: false
             }
         }
     }
-    else if(sTypes.indexOf(instructions[pc-1][0]) >= 0){
+    else if(sTypes.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return{
-            operator: instructions[pc-1][0],
-            dest: instructions[pc-1][2].split("$")[1].split(")")[0],
-            src: instructions[pc-1][1].split("$")[1],
-            offset: parseInt(instructions[pc-1][2].split("(")[0]),
+            operator: instructions[pc][0],
+            dest: instructions[pc][2].split("$")[1].split(")")[0],
+            src: instructions[pc][1].split("$")[1],
+            offset: parseInt(instructions[pc][2].split("(")[0]),
             completed: false
         }
     }
     else{
-        alert("Operation not found: " + instructions[pc][0])
-        processor.running = false
-        return
+        if(instructions[pc].length > 1){
+            alert("Operation not found: " + instructions[pc][0])
+            processor.running = false
+            return
+        }
+        processor.pc += 1
+        return null
     }
 }
 

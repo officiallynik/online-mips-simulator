@@ -125,7 +125,7 @@ processor.operations = {
 }
 
 processor.execute = instruction => {
-    // console.log(instruction)
+    console.log("instruction: " , instruction)
     //arthemetic operations
     if(instruction[0] === "add"){
         const reg1 = instruction[2].split("$")[1]

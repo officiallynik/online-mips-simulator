@@ -100,7 +100,7 @@ const SideBar = props => {
           })}
           >
           {isOpen.analysis ? <i className="fas fa-folder-open"></i> : <i className="fas fa-folder"></i>}
-          ANALYSIS
+          PERFORMANCE ANALYSIS
         </div>
         <div style={isOpen.analysis? {display: 'block', color: 'white'} : {display: 'none'}}>
            Comimg Soon ( phase 2 )

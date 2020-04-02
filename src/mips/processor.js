@@ -41,7 +41,8 @@ var processor = {
             ["ra", 0]
         ]
     ),
-    pc: 0
+    pc: 0,
+    endOfInstr: false
 }
 
 processor.setRegister = (reg, num) => {
@@ -62,6 +63,7 @@ processor.reset = () => {
     processor.dataLables = {}
     processor.instrLabels = {}
     processor.pc = 0
+    processor.endOfInstr = false
     processor.setRegister("sp", 1024*4)
 }
 

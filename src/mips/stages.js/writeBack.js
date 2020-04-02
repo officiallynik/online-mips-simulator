@@ -2,6 +2,7 @@
 import processor from '../processor'
 
 const writeBack = instr => {
+    console.log("WB", instr)
     if(instr.result){
         processor.setRegister(instr.dest, instr.result)
     }

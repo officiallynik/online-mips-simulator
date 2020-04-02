@@ -6,10 +6,20 @@ import Navbar from './component/navbar/Navbar';
 import Console from './component/console/Console'
 import SideBar from './component/sidebar/SideBar'
 
-import parser from './mips/parser'
-import processor from './mips/operations'
-
 import { bubbleSort, sumOfNum } from './samplePrograms'
+
+// importing from mips
+import processor from './mips/processor'
+import parser from './mips/parser'
+import instrFetch from './mips/stages.js/instructionFetch'
+import instrDecodeRegFetch from './mips/stages.js/instructionDecodeAndRegisterFetch'
+import execute from './mips/stages.js/execute'
+import memory from './mips/stages.js/memory'
+import writeBack from './mips/stages.js/writeBack'
+
+var currentOperations = []
+var current_cycle = 0
+var nerdyInfo = []
 
 class App extends Component{
 
@@ -19,7 +29,8 @@ class App extends Component{
     pc: 0,
     print: "//console...read-only\n",
     clicked: "registers",
-    sampleProgramTriggered: false
+    sampleProgramTriggered: false,
+    dataForwarding: false
   }
 
   // --- logic to upload and clear file ---
@@ -50,6 +61,10 @@ class App extends Component{
     processor.reset()
     parser.reset()
 
+    currentOperations = []
+    current_cycle = 0
+    nerdyInfo = []
+
     var textArea = localStorage.getItem("result")
     // console.log(textArea)
     if(textArea === null || textArea.length === 0){
@@ -73,6 +88,86 @@ class App extends Component{
     this.setState({
       print: this.state.print + "Successfully Assembled...\n"
     })
+  }
+
+  // new step-run function
+  stepRunV2 = () => {
+    console.clear()
+    console.log(currentOperations)
+    if(!processor.running){
+      return
+    }
+    var stall = 0
+    var idx = 0
+
+    while(idx < currentOperations.length){
+      if(currentOperations[idx].issue_cycle == null) break;
+
+      if(stall !== 1){
+        switch(currentOperations[idx].stage){
+          case "IF":
+            currentOperations[idx].stage = "ID/RF"
+            nerdyInfo[idx].push("ID/RF")
+            break;
+          case "ID/RF":
+            for(let i=idx-1; i>=0; i--){
+              if(
+                currentOperations[idx].dest 
+                && 
+                (currentOperations[i].dest === currentOperations[idx].src1 
+                || 
+                currentOperations[i].dest === currentOperations[idx].src2)
+                ){
+                  if(this.state.dataForwarding){
+                    // logic
+                  }
+                  else{
+                    // logic
+                  }
+              }
+            }
+            if(stall !== 1){
+              currentOperations[idx] = instrDecodeRegFetch(currentOperations[idx])
+              currentOperations[idx].stage = "EX"
+              nerdyInfo[idx].push("EX")
+            }
+            break;
+          case "EX":
+            currentOperations[idx] = execute(currentOperations[idx])
+            currentOperations[idx].stage = "MEM"
+            nerdyInfo[idx].push("MEM")
+            break;
+          case "MEM":
+            memory(currentOperations[idx])
+            currentOperations[idx].stage = "WB"
+            nerdyInfo[idx].push("WB")
+            break;
+          case "WB":
+            currentOperations[idx] = writeBack(currentOperations[idx])
+            break;
+          default:
+            alert("Something is wrong!!!")
+        }
+        if(stall === 1){
+          nerdyInfo[idx].push("S")
+        }
+      }
+      else{
+        nerdyInfo[idx].push("S")
+      }
+      idx += 1
+    }
+
+    if(!processor.endOfInstr && stall !== 1){
+      var fetchedInstr = instrFetch(processor.pc, this.state.instructions)
+      if(fetchedInstr){
+        fetchedInstr.issue_cycle = current_cycle
+        fetchedInstr.stage = "IF"
+        currentOperations.push(fetchedInstr)
+        nerdyInfo.push(["IF"])
+      }
+    }
+    current_cycle += 1
   }
 
   execute = () => {
@@ -178,7 +273,7 @@ class App extends Component{
             deleteFile = {this.deleteFile} 
             assemble = {this.assemble} 
             execute = {this.execute}
-            stepRun = {this.stepRun}
+            stepRun = {this.stepRunV2}
           />
         </div>
         <div className="App">

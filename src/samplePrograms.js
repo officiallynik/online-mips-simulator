@@ -87,7 +87,7 @@ sum:
 main:
     li $s0, 11
     li $s1, 0
-    li $t0 ,1
+    li $t0, 1
     j sum   `
 
 export {

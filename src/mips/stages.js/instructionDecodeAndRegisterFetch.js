@@ -11,6 +11,7 @@ const r3Types = ['add', 'sub', 'slt'],
       sTypes = ['sw']
 
 const decodeInstruction = instr => {
+    console.log("ID/RF", instr)
     if(r3Types.indexOf(instr.operator) >= 0){
         instr.src1 = parseInt(processor.getRegister(instr.src1))
         instr.src2 = parseInt(processor.getRegister(instr.src2))

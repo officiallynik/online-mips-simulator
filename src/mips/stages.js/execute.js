@@ -1,6 +1,7 @@
 // Exe stage with functionality
 
 const execution = instr => {
+    console.log("EX", instr)
     switch (instr.operator) {
         case 'add':
             instr.result = instr.src1 + instr.src2

@@ -3,6 +3,7 @@
 import processor from '../processor'
 
 const memory = instr => {
+    console.log("MEM", instr)
     if(instr.operator === 'lw'){
         const addr = parseInt(processor.getRegister(instr.src) + (instr.offset * 4)) - 268500992
         const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
@@ -11,6 +12,7 @@ const memory = instr => {
         processor.setRegister(instr.dest, valDec)
     }
     else if(instr.operator === 'li' || instr.operator === 'lui'){
+        // console.log("LIing")
         if(instr.operator === 'li'){
             processor.setRegister(instr.dest, parseInt(instr.val))
         }
