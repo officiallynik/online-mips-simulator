@@ -10,10 +10,15 @@ const r3Types = ['add', 'sub', 'slt'],
       sTypes = ['sw']
 
 const fetchInstruction = (pc, instructions) => {
+    if(parser.pointer.get(instructions[pc][0].split(':')[0])){
+        pc += 1
+        processor.pc += 1 
+    }
     console.log("IF", pc, instructions[pc])
     if(r3Types.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
+            instr: instructions[pc],
             operator: instructions[pc][0],
             dest: instructions[pc][1].split("$")[1],
             src1: instructions[pc][2].split("$")[1],
@@ -24,6 +29,7 @@ const fetchInstruction = (pc, instructions) => {
     else if(r2Types.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
+            instr: instructions[pc],
             operator: instructions[pc][0],
             dest: instructions[pc][1].split("$")[1],
             src1: instructions[pc][2].split("$")[1],
@@ -34,6 +40,7 @@ const fetchInstruction = (pc, instructions) => {
     else if(bTypes.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {
+            instr: instructions[pc],
             operator: instructions[pc][0],
             src1: instructions[pc][1].split("$")[1],
             src2: instructions[pc][2].split("$")[1],
@@ -45,15 +52,17 @@ const fetchInstruction = (pc, instructions) => {
         processor.pc += 1
         if(instructions[pc][0] === 'lw'){
             return {
+                instr: instructions[pc],
                 operator: instructions[pc][0],
                 dest: instructions[pc][1].split("$")[1],
-                src: instructions[pc][2].split("$")[1].split(")")[0],
+                src1: instructions[pc][2].split("$")[1].split(")")[0],
                 offset: parseInt(instructions[pc][2].split("(")[0]),
                 completed: false
             }
         }
         else if(instructions[pc][0] === 'li' || instructions[pc][0] === 'lui'){
             return {
+                instr: instructions[pc],
                 operator: instructions[pc][0],
                 dest: instructions[pc][1].split("$")[1],
                 val: parseInt(instructions[pc][2]),
@@ -62,6 +71,7 @@ const fetchInstruction = (pc, instructions) => {
         }
         else {
             return {
+                instr: instructions[pc],
                 operator: instructions[pc][0],
                 dest: instructions[pc][1].split("$")[1],
                 addr: parser.pointer.get(instructions[pc][2]),
@@ -73,6 +83,7 @@ const fetchInstruction = (pc, instructions) => {
         if(instructions[pc][0] === 'j'){
             processor.pc = parser.pointer.get(instructions[pc][1])
             return {
+                instr: instructions[pc],
                 operator: instructions[pc][0],
                 label: parser.pointer.get(instructions[pc][1]),
                 completed: false
@@ -82,8 +93,9 @@ const fetchInstruction = (pc, instructions) => {
             // processor.pc = parseInt(processor.getRegister(instructions[pc][1].split("$")[1]))
             processor.endOfInstr = true 
             return {
+                instr: instructions[pc],
                 operator: instructions[pc][0],
-                src: instructions[pc][1].split("$")[1],
+                src1: instructions[pc][1].split("$")[1],
                 completed: false
             }
         }
@@ -91,9 +103,10 @@ const fetchInstruction = (pc, instructions) => {
     else if(sTypes.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return{
+            instr: instructions[pc],
             operator: instructions[pc][0],
             dest: instructions[pc][2].split("$")[1].split(")")[0],
-            src: instructions[pc][1].split("$")[1],
+            src1: instructions[pc][1].split("$")[1],
             offset: parseInt(instructions[pc][2].split("(")[0]),
             completed: false
         }
@@ -101,8 +114,9 @@ const fetchInstruction = (pc, instructions) => {
     else if(instructions[pc][0] === "syscall"){
         processor.pc += 1
         return {
+            instr: instructions[pc],
             operator: instructions[pc][0],
-            src: "a0",
+            src1: "a0",
             completed: false
         }
     }

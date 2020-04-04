@@ -8,8 +8,9 @@ const writeBack = instr => {
         processor.setRegister(instr.dest, instr.result)
     }
     if(instr.operator === 'sw'){
+        instr.src1.val = processor.getRegister(instr.src1.reg)
         const addr = parseInt(processor.getRegister(instr.dest) + (instr.offset * 4)) - 268500992
-        var val = instr.src.toString(2)
+        var val = instr.src1.val.toString(2)
         const len = val.length
         for(let i=0; i<32-len; i++){
             val = "0" + val

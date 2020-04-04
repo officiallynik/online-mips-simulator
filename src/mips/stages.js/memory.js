@@ -6,7 +6,8 @@ const memory = instr => {
     console.log("MEM", instr)
     if(instr.operator === 'lw'){
         console.log(instr)
-        const addr = parseInt((instr.src) + (instr.offset * 4)) - 268500992
+        instr.src1.val = processor.getRegister(instr.src1.reg)
+        const addr = parseInt((instr.src1.val) + (instr.offset * 4)) - 268500992
         const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
         const valDec = parseInt(val, 2)
 

@@ -33,6 +33,21 @@ const SideBar = props => {
   }
   // console.log(dataSegment)
 
+  var performance = ""
+  if(Object.keys(props.performance).length === 0 && props.running === 0){
+    performance = <div className="pa-program">Run your assemble code to check performance</div>
+  }
+  else if(props.running === 1){
+    performance = <span className="pa-program">Running...</span>
+  }
+  else{
+    performance = (<div>
+      <div className="pa-program">Number of cycles: {props.performance.cycles}</div>
+      <div className="pa-program">Number of stalls: {props.performance.stalls}</div>
+      <div className="pa-program">IPC: 1</div>
+    </div>)
+  }
+
   return (
     <div className="sidebar">
       <div>
@@ -106,7 +121,7 @@ const SideBar = props => {
           PERFORMANCE ANALYSIS
         </div>
         <div style={isOpen.analysis? {display: 'block', color: 'white'} : {display: 'none'}}>
-           Comimg Soon ( phase 2 )
+          {performance}
         </div>
       </div>
 

@@ -12,7 +12,8 @@ parser.parse = code => {
   const lineWiseSplit = [];
 
   code.split("\n").forEach(line => {
-    lineWiseSplit.push(line.trim().split(/[ ,.]+/));
+    var lineArr = line.trim().split(/[ ,.]+/)
+    if(!(lineArr.length === 1 && lineArr[0] === "")) lineWiseSplit.push(lineArr);
   });
   // console.log(lineWiseSplit)
 

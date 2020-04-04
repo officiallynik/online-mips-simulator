@@ -17,380 +17,546 @@ import execute from './mips/stages.js/execute'
 import memory from './mips/stages.js/memory'
 import writeBack from './mips/stages.js/writeBack'
 
+// some necessary elements
 var currentOperations = []
-var current_cycle = 0
+var current_cycle = 1
 var nerdyInfo = []
-var stalls = 0
 
 class App extends Component {
 
-  state = {
-    instructions: null,
-    registers: processor.registers,
-    pc: 0,
-    print: "//console...read-only\n",
-    clicked: "registers",
-    sampleProgramTriggered: false,
-    dataForwarding: false,
-    running: 0
-  }
+	state = {
+		instructions: null,
+		registers: processor.registers,
+		pc: 0,
+		print: "//console...read-only\n",
+		clicked: "registers",
+		sampleProgramTriggered: false,
+		dataForwarding: false,
+		running: 0,
+		performance: {},
+		pipeline: [],
+		enableMoreStats: false
+	}
 
-  // --- logic to upload and clear file ---
-  setFile = async (event) => {
-    let file = event.target.files[0];
-    //creating a reader object
-    var reader = new FileReader();
-    //reading file
-    reader.onload = function () {
-      // console.log(reader.result);
-      localStorage.setItem('result', String(reader.result));
-      window.location.reload();
-      //  x.showUploadAlert();
-      //  setTimeout(this.showUploadAlert,5000);
-    }
+	// --- logic to upload and clear file ---
+	setFile = async (event) => {
+		let file = event.target.files[0];
+		//creating a reader object
+		var reader = new FileReader();
+		//reading file
+		reader.onload = function () {
+			// console.log(reader.result);
+			localStorage.setItem('result', String(reader.result));
+			window.location.reload();
+		}
 
-    reader.readAsText(file);
-  }
+		reader.readAsText(file);
+	}
 
-  deleteFile = (event) => {
-    localStorage.removeItem("result");
-    window.location.reload()
-    // this.showCleanAlert();
-  }
+	deleteFile = (event) => {
+		localStorage.removeItem("result");
+		window.location.reload()
+	}
 
-  // --- assemble the code from file ---
-  assemble = () => {
-    processor.reset()
-    parser.reset()
+	// --- assemble the code from file ---
+	assemble = () => {
+		processor.reset()
+		parser.reset()
 
-    this.setState({
-      running: 0
-    })
+		this.setState({
+			running: 0
+		})
 
-    currentOperations = []
-    current_cycle = 0
-    nerdyInfo = []
-    stalls = 0
+		currentOperations = []
+		current_cycle = 1
+		nerdyInfo = []
 
-    var textArea = localStorage.getItem("result")
-    // console.log(textArea)
-    if (textArea === null || textArea.length === 0) {
-      alert("Upload or write assembly code first!")
-      return
-    }
-    this.setState({
-      instructions: parser.parse(textArea)
-    })
-
-    if (!!parser.pointer.get("main")) {
-      processor.pc = parseInt(parser.pointer.get("main"))
-    }
-    else {
-      processor.running = false
-    }
-    // console.log("Assembled")
-    // console.log(parser.pointer)
-    // console.log(processor.pc)
-    // console.log(processor.memory)
-    this.setState({
-      print: this.state.print + "Successfully Assembled...\n"
-    })
-  }
-
-  // use stepRunV2 to execute in one step
-  executeV2 = () => {
-    if (!this.state.instructions) {
-      alert("Assemble your code first!")
-      return
-    }
-    this.setState({
-      running: 1
-    })
-
-    const run = window.setInterval(() => {
-      if (!processor.running) {
-        // console.log("END OF INSTRUCTIONS")
-        this.setState({
-          print: this.state.print + "\nEnd of Instructions...",
-          running: 2
-        })
-        window.clearInterval(run)
-        console.log("No. of cycles: " + current_cycle)
-        console.log(nerdyInfo)
-        console.log("No. of stalls: " + stalls)
-        var cpi = 1 + (stalls/current_cycle)
-        console.log("IPC: " + (1/cpi))
-        return
-      }
-      this.stepRunV2()
-
-    }, 0)
-  }
-
-  // new step-run function
-  stepRunV2 = () => {
-    if(processor.pc >= this.state.instructions.length){
-      processor.endOfInstr = true
-      if(currentOperations[currentOperations.length - 1].completed){
-        processor.running = false
-      }
-    }
-    if (!processor.running) {
-      console.clear()
-      console.log("DONE :)")
-      console.log(currentOperations)
-      console.log(nerdyInfo)
-      return
-    }
-
-    console.clear()
-    console.log("Cycle: " + current_cycle)
-    console.log(currentOperations)
-    var stall = 0
-    var idx = 0
-
-    while (idx < currentOperations.length) {
-      if (currentOperations[idx].issue_cycle == null) break;
-
-      if (stall !== 1) {
-        switch (currentOperations[idx].stage) {
-          case "ID/RF":
-            for (let i = idx - 1; i >= 0; i--) {
-              if (
-                currentOperations[i].dest
-                &&
-                (currentOperations[i].dest === currentOperations[idx].src1
-                  ||
-                  currentOperations[i].dest === currentOperations[idx].src2
-                  ||
-                  currentOperations[i].dest === currentOperations[idx].src)
-              ) {
-                console.log("----MAYBE A STALL :( ----")
-                if (this.state.dataForwarding) {
-                  // logic
-                  
-                }
-                else{
-                  console.log("IN ELSE: ", currentOperations[i])
-                  // logic
-                  if(currentOperations[i].stage !== " "){
-                    console.log("STALL :( ")
-                    stall = 1
-                    stalls += 1
-                    break
-                  }
-                }
-              }
-            }
-
-            if (stall !== 1) {
-              currentOperations[idx] = instrDecodeRegFetch(currentOperations[idx])
-              currentOperations[idx].stage = "EX"
-              nerdyInfo[idx].push("ID/RF")
-            }
-            break;
-          case "EX":
-            if(currentOperations[idx].operator === 'syscall'){
-              this.printToConsole(processor.getRegister("v0"), processor.getRegister("a0")) // need to correct this
-            }
-            currentOperations[idx] = execute(currentOperations[idx])
-            currentOperations[idx].stage = "MEM"
-            nerdyInfo[idx].push("EX")
-            break;
-          case "MEM":
-            memory(currentOperations[idx])
-            currentOperations[idx].stage = "WB"
-            nerdyInfo[idx].push("MEM")
-            break;
-          case "WB":
-            currentOperations[idx] = writeBack(currentOperations[idx])
-            currentOperations[idx].stage = " "
-            nerdyInfo[idx].push("WB")
-            break;
-          default: break
-        }
-        if (stall === 1) {
-          nerdyInfo[idx].push("S")
-        }
-      }
-      else {
-        nerdyInfo[idx].push("S")
-      }
-      idx += 1
-    }
-
-    if (!processor.endOfInstr && stall !== 1) {
-      if (currentOperations.length > 0 && (currentOperations[currentOperations.length - 1].operator === "bne" || currentOperations[currentOperations.length - 1].operator === "beq") && currentOperations[currentOperations.length - 1].stage === "ID/RF") {
-        console.log("STALL :( ")
-        stalls += 1
-      }
-      var fetchedInstr = instrFetch(processor.pc, this.state.instructions)
-      if (fetchedInstr) {
-        fetchedInstr.issue_cycle = current_cycle
-        fetchedInstr.stage = "ID/RF"
-        currentOperations.push(fetchedInstr)
-        nerdyInfo.push(["IF"])
-      }
-    }
-
-    current_cycle += 1
-    this.setState({
-      registers: processor.registers
-    })
-  }
-
-  execute = () => {
-    if (!this.state.instructions) {
-      alert("Assemble your code first!")
-      return
-    }
-
-    const run = window.setInterval(() => {
-      if (!processor.running) {
-        // console.log("END OF INSTRUCTIONS")
-        this.setState({
-          print: this.state.print + "\nEnd of Instructions..."
-        })
-        window.clearInterval(run)
-        return
-      }
-      this.stepRun()
-
-    }, 0)
-  }
-
-  stepRun = () => {
-    console.clear()
-    // console.log("PC = " + processor.pc)
-
-    if (!this.state.instructions) {
-      alert("Assemble your code first!")
-      return
-    }
+		var table = document.getElementsByClassName("pipeline-screen")
+		table[1].innerHTML = (
+			`<table border='1' id="table-main">
+				<tr id="cycle-number">
+					<td align='center' nowrap="nowrap" class="instr-cell" id="instr-cell-heading">Cycle/Instruction</td>
+				</tr>
+			</table>`
+		)
 
 
-    if (!processor.running) {
-      // console.log("END OF INSTRUCTIONS")
-      this.setState({
-        print: this.state.print + "\nEnd of Instructions..."
-      })
-      return
-    }
+		var textArea = localStorage.getItem("result")
+		// console.log(textArea)
+		if (textArea === null || textArea.length === 0) {
+			alert("Upload or write assembly code first!")
+			return
+		}
+		this.setState({
+			instructions: parser.parse(textArea)
+		})
+
+		if (!!parser.pointer.get("main")) {
+			processor.pc = parseInt(parser.pointer.get("main"))
+		}
+		else {
+			processor.running = false
+		}
+		this.setState({
+			print: this.state.print + "Successfully Assembled...\n"
+		})
+	}
+
+	// --- execute in single step using repeated step-run
+	Execute = () => {
+		if (!this.state.instructions) {
+			alert("Assemble your code first!")
+			return
+		}
+		this.setState({
+			running: 1
+		})
+
+		const run = window.setInterval(() => {
+			if (!processor.running) {
+				// console.log("END OF INSTRUCTIONS")
+				this.setState({
+					print: this.state.print + "\nEnd of Instructions...",
+					running: 2,
+					performance: {
+						cycles: current_cycle - 1,
+					}
+				})
+				window.clearInterval(run)
+				console.log("No. of cycles: " + parseInt(current_cycle - 1))
+				console.log(nerdyInfo)
+				// console.log("No. of stalls: " + stalls)
+				// var cpi = 1 + (stalls / current_cycle)
+				// console.log("IPC: " + (1 / cpi))
+				return
+			}
+			this.StepRun()
+
+		}, 0)
+	}
 
 
-    processor.execute(this.state.instructions[processor.pc])
+	// --- step-run function implementing pipeline
+	Display_Stall = (row, col) => {
+		if (this.state.enableMoreStats) {
+			var cell = document.getElementsByClassName(`row${row}-col${col}`)
+			cell[0].innerHTML = 'S'
+		}
+		nerdyInfo[row].push("S")
+	}
+	StepRun = () => {
+		if (!this.state.instructions) {
+			alert("Assemble your code first!")
+			return
+		}
+		// Do not do anything if we have already gone through all of the cycles.
+		if (processor.pc >= this.state.instructions.length) {
+			processor.endOfInstr = true
+			if (currentOperations[currentOperations.length - 1].completed) {
+				processor.running = false
+			}
+		}
+		if (!processor.running) {
+			this.setState({
+				performance: {
+					cycles: current_cycle - 1,
+				}
+			})
+			console.clear()
+			console.log("DONE :)")
+			console.log(currentOperations)
+			console.log(nerdyInfo)
+			return
+		}
 
-    this.setState({
-      ...this.state,
-      registers: processor.registers,
-      pc: processor.pc
-    })
+		console.clear()
+		console.log("Cycle: " + current_cycle)
+		console.log(currentOperations)
 
-    // console.log(processor.registers)
-    // console.log(processor.memory)
-    this.setState({
-      instructions: this.state.instructions
-    })
-    processor.pc += 1
+		var stall = 0;
+		var x = 0;
+		var s = ""
 
-    if (this.state.instructions[processor.pc][0] === "syscall") {
-      const regV0 = processor.getRegister("v0")
-      // console.log("SYSCALLING", regV0)
-
-      //printing logic
-      if (regV0 === 1) {
-        const regA0 = processor.getRegister("a0")
-        // console.log("getting a0", regA0)
-
-        const printNew = this.state.print + regA0 + " "
-
-        this.setState({
-          print: printNew
-        })
-      }
-    }
-    // console.log("parser is");
-    // console.log(parser);
-    // console.log("processor is");
-    // console.log(processor);
-  }
+		while (x < currentOperations.length) {
+			// console.log("INTRC: " + x)
+			// console.log(currentOperations[x])
+			// If the stall variable is set, then we should stall and not do any work.
+			if (stall === 1) {
+				this.Display_Stall(x, current_cycle);
+			}
+			else {
+				// Find what stage the current instruciton is in and do work accordingly.
+				switch (currentOperations[x].pipeline_stage) {
 
 
-  // --- other dom logic ---
-  onSideNavClick = (event) => {
-    this.setState({
-      clicked: event
-    })
-  }
+					case "IF":
+						// Set the new stage to ID
+						for (let i = (x - 1); i >= 0; i--) {
+							// console.log("I: " + i)
+							// If the destination register of a previous instruciton is the same and one of the source 
+							// registers of the current instruction.
+							if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+								// We must check if data forwarding is enabled and handle that situation differently.
+								if (currentOperations[i].dest === currentOperations[x].src1 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
+									console.log("HERE")
+									if (this.state.dataForwarding) {
+										// If forwarding is enabled and the previous instruction is not a store or load
+										// and is not in the MEM stage or further in the pipeline, stall.
+										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
 
-  onSampleProgramClick = program => {
-    if (program === "bubbleSort") {
-      localStorage.setItem('result', bubbleSort);
-    }
-    else {
-      localStorage.setItem('result', sumOfNum)
-    }
-    window.location.reload();
-  }
+									else {
+										// If forwarding is disabled and the previous instruction is not completed, stall.
+										if (currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+								// We must check if data forwarding is enabled and handle that situation differently.
+								if (currentOperations[i].dest === currentOperations[x].src2 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
+									if (this.state.dataForwarding) {
+										// If forwarding is enabled and the previous instruction is not a store or load
+										// and is not in the MEM stage or further in the pipeline, stall.
+										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
 
-  onDataForwardEnable = () => {
-    const df = this.state.dataForwarding
-    this.setState({
-      dataForwarding: !df
-    })
-  }
+									else {
+										// If forwarding is disabled and the previous instruction is not completed, stall.
+										if (currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
+						}
 
-  printToConsole = (regV0, regA0) => {
-    //printing logic
-    if (regV0 === 1) {
-      // console.log("getting a0", regA0)
-      const printNew = this.state.print + regA0 + " "
-      this.setState({
-        print: printNew
-      })
-    }
-  }
+						// If no stalls have been detected.
+						if (stall !== 1) {
+							// Move the instruction into the EX stage.
+							currentOperations[x] = instrDecodeRegFetch(currentOperations[x])
+							currentOperations[x].pipeline_stage = "ID/RF"
+						}
+						break;
 
-  render = () => {
-    return (
-      <div className="main-screen">
-        <div>
-          <Navbar
-            setFile={this.setFile}
-            deleteFile={this.deleteFile}
-            assemble={this.assemble}
-            execute={this.executeV2}
-            stepRun={this.stepRunV2}
-            toggleDF={this.onDataForwardEnable}
-            dataForw={this.state.dataForwarding}
-            running={this.state.running}
-          />
-        </div>
-        <div className="App">
-          <div style={{ width: '17%' }}>
-            <SideBar
-              registers={this.state.registers}
-              pc={this.state.pc}
-              clicked={this.state.clicked}
-              onNavClick={this.onSideNavClick}
-              dataSegment={processor.memory}
-              memoryUsed={parser.memPtr}
-              sampleProgram={this.onSampleProgramClick}
-            />
-          </div>
-          <div style={{ width: '83%' }}>
-            <IDE
-              pc={this.state.pc}
-            />
-            <div style={{ height: '1px', backgroundColor: 'white' }}></div>
-            <Console
-              console={this.state.print}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
+					case "ID/RF":
+						// console.log("X: " + x)
+						// Check if this instruction can be executed by comparing it against all previous instructions.
+						for (let i = (x - 1); i >= 0; i--) {
+							// console.log("I: " + i)
+
+							// If a previous instruction is in the EX stage and both instructions use the same functional unit.
+							if (currentOperations[i].pipeline_stage === "EX" && currentOperations[i].operator === currentOperations[x].operator) {
+								// *** Structural Hazard ***
+								stall = 1;
+								break;
+							}
+
+							// If the destination register of a previous instruciton is the same and one of the source 
+							// registers of the current instruction.
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+								// We must check if data forwarding is enabled and handle that situation differently.
+								if (currentOperations[i].dest === currentOperations[x].src1.reg) {
+									if (this.state.dataForwarding) {
+										// If forwarding is enabled and the previous instruction is not a store or load
+										// and is not in the MEM stage or further in the pipeline, stall.
+										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+
+									else {
+										// If forwarding is disabled and the previous instruction is not completed, stall.
+										if (currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+								// We must check if data forwarding is enabled and handle that situation differently.
+								if (currentOperations[i].dest === currentOperations[x].src2.reg) {
+									if (this.state.dataForwarding) {
+										// If forwarding is enabled and the previous instruction is not a store or load
+										// and is not in the MEM stage or further in the pipeline, stall.
+										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+
+									else {
+										// If forwarding is disabled and the previous instruction is not completed, stall.
+										if (currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
+
+							// If the destination registers are the same for both instructions and the destination registers
+							// are not equal to "null."  The destination register will only equal "null" for BR and SD 
+							// instructions.
+							else if (currentOperations[i].dest && (currentOperations[i].dest === currentOperations[x].dest)) {
+
+								// If a previous instruction is in the EX stage and the remaining cycles for that
+								// previous instruction is greater than or equal to the current instruction's 
+								// execution cycles minus one.  (The minus one is there because the previous instructions
+								// will have already been moved into their "next" stage while the current instruciton 
+								// hasn't been executed yet.)
+								if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) >= 0)) {
+									// *** WAW Hazard ***
+									stall = 1;
+									break;
+								}
+
+							}
+
+							// If a previous instruction is in the EX stage and the remaining cycles for that
+							// previous instruction is equal to the current instruction's execution cycles minus one.
+							// (The minus one is there because the previous instructions will have already been moved into
+							// their "next" stage while the current instruciton hasn't been executed yet.)
+							else if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
+
+								// *** WB will happen at the same time ***
+								stall = 1;
+								break;
+							}
+						}
+
+						// If no stalls have been detected.
+						if (stall !== 1) {
+							// Move the instruction into the EX stage.
+							currentOperations[x].pipeline_stage = "EX";
+							if (currentOperations[x].operator === 'syscall') {
+								this.printToConsole(processor.getRegister("v0"), processor.getRegister("a0")) // need to correct this
+							}
+							currentOperations[x] = execute(currentOperations[x])
+							currentOperations[x].execute_counter++;
+						}
+						break;
+
+					case "EX":
+						currentOperations[x].pipeline_stage = "MEM";
+						memory(currentOperations[x])
+						break;
+
+					case "MEM":
+						currentOperations[x].pipeline_stage = "WB";
+						currentOperations[x] = writeBack(currentOperations[x])
+						break;
+
+					case "WB":
+						// Complete the execution of this instruction.
+						currentOperations[x].pipeline_stage = " ";
+						break;
+
+					case " ":
+						currentOperations[x].pipeline_stage = " ";
+						break;
+
+					default:
+						// Handle the unlikely error that the instruction is in an undefined pipeline stage.
+						alert("Unrecognized Pipeline Stage!");
+						return;
+				}
+
+				// If a stall occured, set the output to "s".
+				if (stall === 1) {
+					this.Display_Stall(x, current_cycle);
+				}
+				else {
+					s = currentOperations[x].pipeline_stage
+					if (s !== " " && this.state.enableMoreStats) {
+						var cell = document.getElementsByClassName(`row${x}-col${current_cycle}`)
+						cell[0].innerHTML = s
+					}
+					nerdyInfo[x].push(s)
+				}
+				// Display the value on the screen.
+			}
+			x++;
+		} // End of while loop
+
+		// If we didn't encounter a stall in one of the previous instructions, and if not all of the instructions are in the pipeline.
+		if (stall !== 1 && !processor.endOfInstr) {
+			// Issue a new instruction.
+			if (currentOperations.length > 0 && (currentOperations[currentOperations.length - 1].operator === "bne" || currentOperations[currentOperations.length - 1].operator === "beq") && currentOperations[currentOperations.length - 1].pipeline_stage === "ID/RF") {
+				stall = 1
+				nerdyInfo.push(["S"])
+			}
+			else {
+				var fetchedInstr = instrFetch(processor.pc, this.state.instructions)
+				if (fetchedInstr) {
+					if (this.state.enableMoreStats) {
+						this.addToTable(x, fetchedInstr.instr)
+					}
+					fetchedInstr.pipeline_stage = "IF"
+					fetchedInstr.execute_counter = 0
+					currentOperations.push(fetchedInstr)
+					if (nerdyInfo[x] === undefined) {
+						nerdyInfo.push(["IF"])
+					}
+					else {
+						nerdyInfo[x].push("IF")
+						this.Display_Stall(x, current_cycle - 1)
+					}
+					if (this.state.enableMoreStats) {
+						cell = document.getElementsByClassName(`row${x}-col${current_cycle}`)
+						cell[0].innerHTML = 'IF'
+					}
+				}
+			}
+		}
+
+		console.log("Registers: ")
+		console.log(processor.registers)
+		this.setState({
+			registers: processor.registers
+		})
+
+		// Increment the cycle count.
+		current_cycle++;
+	}
+
+
+	// --- other dom logic ---
+	addToTable = (x, instr) => {
+		var table = document.getElementById("table-main")
+		var cycleRow = document.getElementById("cycle-number")
+		for (let i = 5 * x; i < 5 * x + 5; i++) {
+			var cell = cycleRow.insertCell(i + 1)
+			cell.setAttribute("align", "center")
+			cell.setAttribute("nowrap", "nowrap")
+			cell.className = "num-cell"
+			cell.id = "num-cell-heading"
+			cell.innerHTML = i + 1
+		}
+		var instrRow = table.insertRow(x + 1)
+		var instrCell = instrRow.insertCell(0)
+		instrCell.className = `instr-cell row${x}-col${0}`
+		instrCell.innerHTML = instr.join(" ")
+		for (let i = 1; i <= 5 * x + 5; i++) {
+			var instrNum = instrRow.insertCell(i)
+			instrNum.className = `num-cell row${x}-col${i}`
+		}
+	}
+
+
+	onSideNavClick = (event) => {
+		this.setState({
+			clicked: event
+		})
+	}
+
+	onSampleProgramClick = program => {
+		if (program === "bubbleSort") {
+			localStorage.setItem('result', bubbleSort);
+		}
+		else {
+			localStorage.setItem('result', sumOfNum)
+		}
+		window.location.reload();
+	}
+
+	onDataForwardEnable = () => {
+		const df = this.state.dataForwarding
+		if (!df) {
+			this.assemble()
+		}
+		this.setState({
+			dataForwarding: !df
+		})
+	}
+
+	printToConsole = (regV0, regA0) => {
+		//printing logic
+		if (regV0 === 1) {
+			// console.log("getting a0", regA0)
+			const printNew = this.state.print + regA0 + " "
+			this.setState({
+				print: printNew
+			})
+		}
+	}
+
+	onEnableMoreStats = () => {
+		const moreStats = this.state.enableMoreStats
+		if (!moreStats) {
+			this.assemble()
+		}
+		this.setState({
+			enableMoreStats: !moreStats
+		})
+	}
+
+	render = () => {
+		return (
+			<div className="main-screen">
+				<div>
+					<Navbar
+						setFile={this.setFile}
+						deleteFile={this.deleteFile}
+						assemble={this.assemble}
+						execute={this.Execute}
+						stepRun={this.StepRun}
+						toggleDF={this.onDataForwardEnable}
+						dataForw={this.state.dataForwarding}
+						running={this.state.running}
+						toggleMS={this.onEnableMoreStats}
+						moreStats={this.state.enableMoreStats}
+					/>
+				</div>
+				<div className="App">
+					<div style={{ width: '20%' }}>
+						<SideBar
+							registers={this.state.registers}
+							pc={this.state.pc}
+							clicked={this.state.clicked}
+							onNavClick={this.onSideNavClick}
+							dataSegment={processor.memory}
+							memoryUsed={parser.memPtr}
+							sampleProgram={this.onSampleProgramClick}
+							running={this.state.running}
+							performance={this.state.performance}
+						/>
+					</div>
+					<div style={{ width: '80%' }}>
+						<IDE
+							pc={this.state.pc}
+						/>
+						<div style={{ height: '1px', backgroundColor: 'white' }}></div>
+						<Console
+							console={this.state.print}
+							operations={currentOperations}
+							moreStats={this.state.enableMoreStats}
+						/>
+					</div>
+				</div>
+			</div>
+		)
+	}
 }
+
 
 export default App;

@@ -10,13 +10,13 @@ class Navbar extends React.Component{
     render(){
         var runButton = ""
         if(this.props.running === 1){
-            runButton = <span href="#" ><i class="fas fa-spinner" style={{color: "yellow"}}></i> Running</span>
+            runButton = <span href="#" ><i className="fas fa-spinner" style={{color: "yellow"}}></i> Running</span>
         }
         else if(this.props.running === 2){
-            runButton = <span href="#" ><i class="fas fa-check" style={{color: '"yellow'}}></i> Done</span>
+            runButton = <span href="#" ><i className="fas fa-check" style={{color: '"yellow'}}></i> Done</span>
         }
         else{
-            runButton = <span href="#" ><i class="fas fa-play" style={{color: "yellow"}}></i> Run</span>
+            runButton = <span href="#" ><i className="fas fa-play" style={{color: "yellow"}}></i> Run</span>
         }
         return (
             <nav className="main-nav">
@@ -39,6 +39,12 @@ class Navbar extends React.Component{
                     <div className="nav-item nav-buttons" onClick={() => this.props.toggleDF()} style={this.props.dataForw? {backgroundColor: "green"}: {}}> 
                         <span>
                             Data Forward
+                        </span>
+                    </div>
+
+                    <div className="nav-item nav-buttons" onClick={() => this.props.toggleMS()} style={this.props.moreStats? {backgroundColor: "green"}: {}}> 
+                        <span>
+                            More Stats
                         </span>
                     </div>
 

@@ -13,35 +13,50 @@ const r3Types = ['add', 'sub', 'slt'],
 const decodeInstruction = instr => {
     console.log("ID/RF", instr)
     if(r3Types.indexOf(instr.operator) >= 0){
-        instr.src1 = parseInt(processor.getRegister(instr.src1))
-        instr.src2 = parseInt(processor.getRegister(instr.src2))
+        instr.src1 = {
+            val: parseInt(processor.getRegister(instr.src1)),
+            reg: instr.src1
+        }
+        instr.src2 = {
+            val: parseInt(processor.getRegister(instr.src2)),
+            reg: instr.src2
+        }
         return instr
     } 
     else if(r2Types.indexOf(instr.operator) >= 0){
-        instr.src1 = parseInt(processor.getRegister(instr.src1))
+        instr.src1 = {
+            val: parseInt(processor.getRegister(instr.src1)),
+            reg: instr.src1
+        }
         return instr
     }
     else if(bTypes.indexOf(instr.operator) >= 0){
-        instr.src1 = parseInt(processor.getRegister(instr.src1))
-        instr.src2 = parseInt(processor.getRegister(instr.src2))
+        instr.src1 = {
+            val: parseInt(processor.getRegister(instr.src1)),
+            reg: instr.src1
+        }
+        instr.src2 = {
+            val: parseInt(processor.getRegister(instr.src2)),
+            reg: instr.src2
+        }
 
-        if(instr.operator === 'beq' && instr.src1 === instr.src2){
+        if(instr.operator === 'beq' && instr.src1.val === instr.src2.val){
             processor.pc = instr.label
         }
-        else if(instr.operator === 'bne' && instr.src1 !== instr.src2){
+        else if(instr.operator === 'bne' && instr.src1.val !== instr.src2.val){
             processor.pc = instr.label
         }
 
         return instr
     }
     else if(wTypes.indexOf(instr.operator) >= 0){
-        if(instr.operator === 'lw') instr.src = parseInt(processor.getRegister(instr.src))    
+        if(instr.operator === 'lw') instr.src1 = {val: parseInt(processor.getRegister(instr.src1)), reg: instr.src1}    
         return instr
     }
     else if(jTypes.indexOf(instr.operator) >= 0){
         if(instr.operator === 'jr'){
-            instr.src = parseInt(processor.getRegister(instr.src))
-            processor.pc = instr.src
+            instr.src1 = {val: parseInt(processor.getRegister(instr.src1)), reg: instr.src1}
+            processor.pc = instr.src1.val
         }
         else{
             processor.pc = instr.label
@@ -49,12 +64,12 @@ const decodeInstruction = instr => {
         return instr
     }
     else if (sTypes.indexOf(instr.operator) >= 0){
-        instr.src = parseInt(processor.getRegister(instr.src))
+        instr.src1 = {val: parseInt(processor.getRegister(instr.src1)), reg: instr.src1}
 
         return instr
     }
     else if(instr.operator === "syscall"){
-        instr.src = parseInt(processor.getRegister(instr.src))
+        instr.src1 = {val: parseInt(processor.getRegister(instr.src1)), reg: instr.src1}
 
         return instr
     }  
