@@ -3,7 +3,7 @@
 import processor from "../processor"
 
 const execution = instr => {
-    console.log("EX", instr)
+    // console.log("EX", instr)
         // alert("DF")
         switch (instr.operator) {
             case 'add':

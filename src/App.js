@@ -20,7 +20,8 @@ import writeBack from './mips/stages.js/writeBack'
 // some necessary elements
 var currentOperations = []
 var current_cycle = 1
-var nerdyInfo = []
+var stalls = 0
+var stalled = 0
 
 class App extends Component {
 
@@ -75,7 +76,8 @@ class App extends Component {
 
 		currentOperations = []
 		current_cycle = 1
-		nerdyInfo = []
+		stalls = 0
+		stalled = 0
 
 		var table = document.getElementsByClassName("pipeline-screen")
 		table[1].innerHTML = (
@@ -127,11 +129,11 @@ class App extends Component {
 					running: 2,
 					performance: {
 						cycles: current_cycle - 1,
+						stalls: stalls
 					}
 				})
 				window.clearInterval(run)
-				console.log("No. of cycles: " + parseInt(current_cycle - 1))
-				console.log(nerdyInfo)
+				// console.log("No. of cycles: " + parseInt(current_cycle - 1))
 				// console.log("No. of stalls: " + stalls)
 				// var cpi = 1 + (stalls / current_cycle)
 				// console.log("IPC: " + (1 / cpi))
@@ -149,7 +151,7 @@ class App extends Component {
 			var cell = document.getElementsByClassName(`row${row}-col${col}`)
 			cell[0].innerHTML = 'S'
 		}
-		nerdyInfo[row].push("S")
+		stalls += 1
 	}
 	StepRun = () => {
 		if (!this.state.instructions) {
@@ -167,18 +169,18 @@ class App extends Component {
 			this.setState({
 				performance: {
 					cycles: current_cycle - 1,
+					stalls: stalls
 				}
 			})
-			console.clear()
-			console.log("DONE :)")
-			console.log(currentOperations)
-			console.log(nerdyInfo)
+			// console.clear()
+			// console.log("DONE :)")
+			// console.log(currentOperations)
 			return
 		}
 
-		console.clear()
-		console.log("Cycle: " + current_cycle)
-		console.log(currentOperations)
+		// console.clear()
+		// console.log("Cycle: " + current_cycle)
+		// console.log(currentOperations)
 
 		var stall = 0;
 		var x = 0;
@@ -200,18 +202,15 @@ class App extends Component {
 						// Set the new stage to ID
 						for (let i = (x - 1); i >= 0; i--) {
 							// console.log("I: " + i)
-							// If the destination register of a previous instruciton is the same and one of the source 
-							// registers of the current instruction.
-							if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+
+							if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src1 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
-									console.log("HERE")
-									if (this.state.dataForwarding) {
-										console.log("FORWARDING DATA 1")
-										console.log("Result: " + currentOperations[i].result)
+									// console.log("HERE")
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
+										// console.log("FORWARDING DATA 1")
+										// console.log("Result: " + currentOperations[i].result)
 										currentOperations[x].dep1 = currentOperations[i].result
-										// If forwarding is enabled and the previous instruction is not a store or load
-										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
 											stall = 1;
@@ -229,15 +228,13 @@ class App extends Component {
 									}
 								}
 							}
-							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src2 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
-									if (this.state.dataForwarding) {
-										console.log("FORWARDING DATA 2")
-										console.log("Result: " + currentOperations[i].result)
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
+										// console.log("FORWARDING DATA 2")
+										// console.log("Result: " + currentOperations[i].result)
 										currentOperations[x].dep2 = currentOperations[i].result
-										// If forwarding is enabled and the previous instruction is not a store or load
-										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
 											stall = 1;
@@ -270,23 +267,15 @@ class App extends Component {
 						// Check if this instruction can be executed by comparing it against all previous instructions.
 						for (let i = (x - 1); i >= 0; i--) {
 							// console.log("I: " + i)
-
-							// If a previous instruction is in the EX stage and both instructions use the same functional unit.
 							if (currentOperations[i].pipeline_stage === "EX" && currentOperations[i].operator === currentOperations[x].operator) {
 								// *** Structural Hazard ***
 								stall = 1;
 								break;
 							}
-
-							// If the destination register of a previous instruciton is the same and one of the source 
-							// registers of the current instruction.
-							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
-								// We must check if data forwarding is enabled and handle that situation differently.
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
 								if (currentOperations[i].dest === currentOperations[x].src1.reg) {
-									if (this.state.dataForwarding) {
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
 										currentOperations[x].dep1 = currentOperations[i].result
-										// If forwarding is enabled and the previous instruction is not a store or load
-										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
 											stall = 1;
@@ -295,7 +284,6 @@ class App extends Component {
 									}
 
 									else {
-										// If forwarding is disabled and the previous instruction is not completed, stall.
 										if (currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
 											stall = 1;
@@ -304,13 +292,10 @@ class App extends Component {
 									}
 								}
 							}
-							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
-								// We must check if data forwarding is enabled and handle that situation differently.
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
 								if (currentOperations[i].dest === currentOperations[x].src2.reg) {
-									if (this.state.dataForwarding) {
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
 										currentOperations[x].dep2 = currentOperations[i].result
-										// If forwarding is enabled and the previous instruction is not a store or load
-										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
 											stall = 1;
@@ -328,17 +313,8 @@ class App extends Component {
 									}
 								}
 							}
+							else if (currentOperations[i].dest && (currentOperations[i].dest === currentOperations[x].dest)) {
 
-							// If the destination registers are the same for both instructions and the destination registers
-							// are not equal to "null."  The destination register will only equal "null" for BR and SD 
-							// instructions.
-							else if (!currentOperations[i].completed && currentOperations[i].dest && (currentOperations[i].dest === currentOperations[x].dest)) {
-
-								// If a previous instruction is in the EX stage and the remaining cycles for that
-								// previous instruction is greater than or equal to the current instruction's 
-								// execution cycles minus one.  (The minus one is there because the previous instructions
-								// will have already been moved into their "next" stage while the current instruciton 
-								// hasn't been executed yet.)
 								if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) >= 0)) {
 									// *** WAW Hazard ***
 									stall = 1;
@@ -347,11 +323,7 @@ class App extends Component {
 
 							}
 
-							// If a previous instruction is in the EX stage and the remaining cycles for that
-							// previous instruction is equal to the current instruction's execution cycles minus one.
-							// (The minus one is there because the previous instructions will have already been moved into
-							// their "next" stage while the current instruciton hasn't been executed yet.)
-							else if (!currentOperations[i].completed && (currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
+							else if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
 
 								// *** WB will happen at the same time ***
 								stall = 1;
@@ -396,7 +368,6 @@ class App extends Component {
 						break;
 
 					default:
-						// Handle the unlikely error that the instruction is in an undefined pipeline stage.
 						alert("Unrecognized Pipeline Stage!");
 						return;
 				}
@@ -411,19 +382,17 @@ class App extends Component {
 						var cell = document.getElementsByClassName(`row${x}-col${current_cycle}`)
 						cell[0].innerHTML = s
 					}
-					nerdyInfo[x].push(s)
 				}
 				// Display the value on the screen.
 			}
 			x++;
-		} // End of while loop
+		}
 
-		// If we didn't encounter a stall in one of the previous instructions, and if not all of the instructions are in the pipeline.
 		if (stall !== 1 && !processor.endOfInstr) {
 			// Issue a new instruction.
 			if (currentOperations.length > 0 && (currentOperations[currentOperations.length - 1].operator === "bne" || currentOperations[currentOperations.length - 1].operator === "beq") && currentOperations[currentOperations.length - 1].pipeline_stage === "ID/RF") {
 				stall = 1
-				nerdyInfo.push(["S"])
+				stalled = 1
 			}
 			else {
 				var fetchedInstr = instrFetch(processor.pc, this.state.instructions)
@@ -434,12 +403,9 @@ class App extends Component {
 					fetchedInstr.pipeline_stage = "IF"
 					fetchedInstr.execute_counter = 0
 					currentOperations.push(fetchedInstr)
-					if (nerdyInfo[x] === undefined) {
-						nerdyInfo.push(["IF"])
-					}
-					else {
-						nerdyInfo[x].push("IF")
-						this.Display_Stall(x, current_cycle - 1)
+					if(stalled === 1){
+						this.Display_Stall(x, current_cycle-1)
+						stalled = 0
 					}
 					if (this.state.enableMoreStats) {
 						cell = document.getElementsByClassName(`row${x}-col${current_cycle}`)
@@ -449,8 +415,8 @@ class App extends Component {
 			}
 		}
 
-		console.log("Registers: ")
-		console.log(processor.registers)
+		// console.log("Registers: ")
+		// console.log(processor.registers)
 		this.setState({
 			registers: processor.registers
 		})

@@ -14,7 +14,7 @@ const fetchInstruction = (pc, instructions) => {
         pc += 1
         processor.pc += 1 
     }
-    console.log("IF", pc, instructions[pc])
+    // console.log("IF", pc, instructions[pc])
     if(r3Types.indexOf(instructions[pc][0]) >= 0){
         processor.pc += 1
         return {

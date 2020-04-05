@@ -44,7 +44,7 @@ const SideBar = props => {
     performance = (<div>
       <div className="pa-program">Number of cycles: {props.performance.cycles}</div>
       <div className="pa-program">Number of stalls: {props.performance.stalls}</div>
-      <div className="pa-program">IPC: 1</div>
+      <div className="pa-program">IPC: {(1/(1+(props.performance.stalls/props.performance.cycles))).toFixed(2)}</div>
     </div>)
   }
 
@@ -102,7 +102,7 @@ const SideBar = props => {
           {
             dataSegment.map((ele, idx) => {
               return (
-                <div id={idx} className="data-segment">{ele.dec}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ fontSize: "11px" }}>{ele.bin}</span></div>
+                <div key={idx} className="data-segment">{ele.dec}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ fontSize: "11px" }}>{ele.bin}</span></div>
               )
             })
           }

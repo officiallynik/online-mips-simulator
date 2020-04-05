@@ -15,8 +15,8 @@ const Console = props => {
     const pipelineScreen = () => {
         setIsConsole(false)
     }
-    console.log("Ops: ")
-    console.log(props.operations.length)
+    // console.log("Ops: ")
+    // console.log(props.operations.length)
 
     return (
         <div className={"console-wrapper"}>

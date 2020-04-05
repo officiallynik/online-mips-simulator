@@ -2,9 +2,9 @@
 import processor from '../processor'
 
 const writeBack = instr => {
-    console.log("WB", instr)
+    // console.log("WB", instr)
     if(instr["result"] !== undefined && instr["dest"] !== undefined){ 
-        console.log(instr.dest, instr.result)
+        // console.log(instr.dest, instr.result)
         processor.setRegister(instr.dest, instr.result)
     }
     if(instr.operator === 'sw'){

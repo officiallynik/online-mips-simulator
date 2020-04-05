@@ -11,7 +11,7 @@ const r3Types = ['add', 'sub', 'slt'],
       sTypes = ['sw']
 
 const decodeInstruction = instr => {
-    console.log("ID/RF", instr)
+    // console.log("ID/RF", instr)
     if(r3Types.indexOf(instr.operator) >= 0){
         instr.src1 = {
             val: parseInt(processor.getRegister(instr.src1)),
@@ -52,7 +52,7 @@ const decodeInstruction = instr => {
             instr.dep2 = ""
         }
 
-        console.log("SRC1: " + src1 +"SRC2: " + src2)
+        // console.log("SRC1: " + src1 +"SRC2: " + src2)
 
         if(instr.operator === 'beq' && src1 === src2){
             processor.pc = instr.label
