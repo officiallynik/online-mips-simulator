@@ -43,7 +43,7 @@ const Console = props => {
                 <div style={{color: 'orange'}}><span style={{fontWeight:'bold'}}>Warning:</span> Do Not Turn On For Large Programs Like 'Bubble Sort', As Time Taken To Complete The Task May Increase By Large Amount Or System May Hang!!</div>
             </div>
             <div className="pipeline-screen" style={!isConsole && props.operations.length > 0 && props.moreStats ? { display: 'block' } : { display: 'none' }}>
-                <table border='1' id="table-main">
+                <table border='2' id="table-main">
 					<tr id="cycle-number">
 						<td align='center' nowrap="nowrap" className="instr-cell" id="instr-cell-heading">Cycle/Instruction</td>
 					</tr>
