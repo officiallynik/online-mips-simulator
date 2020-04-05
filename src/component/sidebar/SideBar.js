@@ -137,8 +137,9 @@ const SideBar = props => {
           SAMPLE PROGRAMS
         </div>
         <div style={isOpen.sampleProgram? {display: 'block'} : {display: 'none'}}>
-          <div className="s-program" onClick={() => {props.sampleProgram("bubbleSort")}}>Bubble Sort</div>
-          <div className="s-program" onClick={() => {props.sampleProgram("sumOfNums")}}>Sum of first 10 natural numbers</div>
+          <div className="s-program" onClick={() => {props.sampleProgram("bubbleSort")}}><span style={{color:'yellow', fontSize:'11px'}}>asm </span>Bubble Sort</div>
+          <div className="s-program" onClick={() => {props.sampleProgram("sumOfNums")}}><span style={{color:'yellow', fontSize:'11px'}}>asm </span>Sum of first 10 natural numbers</div>
+          <div className="s-program" onClick={() => {props.sampleProgram("tryOutPipeline")}}><span style={{color:'yellow', fontSize:'11px'}}>asm </span>Try Out Pipeline</div>
         </div>
       </div>
     </div>

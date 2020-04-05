@@ -39,11 +39,25 @@ const decodeInstruction = instr => {
             val: parseInt(processor.getRegister(instr.src2)),
             reg: instr.src2
         }
+        var src1 = instr.src1.val
+        var src2 = instr.src2.val
 
-        if(instr.operator === 'beq' && instr.src1.val === instr.src2.val){
+        if(instr.dep1 !== undefined && instr.dep1 !== ""){
+            src1 = instr.dep1
+            instr.dep1 = ""
+        }
+
+        if(instr.dep2 !== undefined && instr.dep2 !== ""){
+            src2 = instr.dep2
+            instr.dep2 = ""
+        }
+
+        console.log("SRC1: " + src1 +"SRC2: " + src2)
+
+        if(instr.operator === 'beq' && src1 === src2){
             processor.pc = instr.label
         }
-        else if(instr.operator === 'bne' && instr.src1.val !== instr.src2.val){
+        else if(instr.operator === 'bne' && src1 !== src2){
             processor.pc = instr.label
         }
 
@@ -56,7 +70,12 @@ const decodeInstruction = instr => {
     else if(jTypes.indexOf(instr.operator) >= 0){
         if(instr.operator === 'jr'){
             instr.src1 = {val: parseInt(processor.getRegister(instr.src1)), reg: instr.src1}
-            processor.pc = instr.src1.val
+            src1 = instr.src1.val
+            if(instr.dep1 !== undefined && instr.dep1 !== ""){
+                src1 = instr.dep1
+                instr.dep1 = ""
+            }
+            processor.pc = src1
         }
         else{
             processor.pc = instr.label

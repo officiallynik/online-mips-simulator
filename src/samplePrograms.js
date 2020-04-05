@@ -90,7 +90,17 @@ main:
     li $t0, 1
     j sum   `
 
+const tryOutPipeline = `.globl main
+main:
+    addi $t0, $t0, 10
+    addi $t1, $t0, 10
+    addi $t2, $t1, 10
+    addi $t3, $t2, 10
+    addi $t4, $t3, 10
+`
+
 export {
     sumOfNum,
-    bubbleSort
+    bubbleSort,
+    tryOutPipeline
 }

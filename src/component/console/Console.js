@@ -45,7 +45,7 @@ const Console = props => {
             <div className="pipeline-screen" style={!isConsole && props.operations.length > 0 && props.moreStats ? { display: 'block' } : { display: 'none' }}>
                 <table border='1' id="table-main">
 					<tr id="cycle-number">
-						<td align='center' nowrap="nowrap" class="instr-cell" id="instr-cell-heading">Cycle/Instruction</td>
+						<td align='center' nowrap="nowrap" className="instr-cell" id="instr-cell-heading">Cycle/Instruction</td>
 					</tr>
 				</table>
             </div>

@@ -6,7 +6,7 @@ import Navbar from './component/navbar/Navbar';
 import Console from './component/console/Console'
 import SideBar from './component/sidebar/SideBar'
 
-import { bubbleSort, sumOfNum } from './samplePrograms'
+import { bubbleSort, sumOfNum, tryOutPipeline } from './samplePrograms'
 
 // importing from mips
 import processor from './mips/processor'
@@ -25,6 +25,7 @@ var nerdyInfo = []
 class App extends Component {
 
 	state = {
+		code: "",
 		instructions: null,
 		registers: processor.registers,
 		pc: 0,
@@ -43,19 +44,24 @@ class App extends Component {
 		let file = event.target.files[0];
 		//creating a reader object
 		var reader = new FileReader();
+
 		//reading file
-		reader.onload = function () {
+		reader.onload = () => {
 			// console.log(reader.result);
-			localStorage.setItem('result', String(reader.result));
-			window.location.reload();
+			this.setState({
+				code: String(reader.result)
+			})
 		}
 
 		reader.readAsText(file);
 	}
 
 	deleteFile = (event) => {
-		localStorage.removeItem("result");
-		window.location.reload()
+		// localStorage.removeItem("result");
+		// window.location.reload()
+		this.setState({
+			code: ""
+		})
 	}
 
 	// --- assemble the code from file ---
@@ -81,9 +87,10 @@ class App extends Component {
 		)
 
 
-		var textArea = localStorage.getItem("result")
+		// var textArea = localStorage.getItem("result")
+		var textArea = this.state.code
 		// console.log(textArea)
-		if (textArea === null || textArea.length === 0) {
+		if (textArea === "") {
 			alert("Upload or write assembly code first!")
 			return
 		}
@@ -195,11 +202,14 @@ class App extends Component {
 							// console.log("I: " + i)
 							// If the destination register of a previous instruciton is the same and one of the source 
 							// registers of the current instruction.
-							if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+							if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src1 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
 									console.log("HERE")
 									if (this.state.dataForwarding) {
+										console.log("FORWARDING DATA 1")
+										console.log("Result: " + currentOperations[i].result)
+										currentOperations[x].dep1 = currentOperations[i].result
 										// If forwarding is enabled and the previous instruction is not a store or load
 										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
@@ -219,10 +229,13 @@ class App extends Component {
 									}
 								}
 							}
-							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src2 && (currentOperations[x].operator === "beq" || currentOperations[x].operator === "bne")) {
 									if (this.state.dataForwarding) {
+										console.log("FORWARDING DATA 2")
+										console.log("Result: " + currentOperations[i].result)
+										currentOperations[x].dep2 = currentOperations[i].result
 										// If forwarding is enabled and the previous instruction is not a store or load
 										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
@@ -267,10 +280,11 @@ class App extends Component {
 
 							// If the destination register of a previous instruciton is the same and one of the source 
 							// registers of the current instruction.
-							else if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src1.reg) {
 									if (this.state.dataForwarding) {
+										currentOperations[x].dep1 = currentOperations[i].result
 										// If forwarding is enabled and the previous instruction is not a store or load
 										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
@@ -290,10 +304,11 @@ class App extends Component {
 									}
 								}
 							}
-							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+							else if (!currentOperations[i].completed && currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
 								// We must check if data forwarding is enabled and handle that situation differently.
 								if (currentOperations[i].dest === currentOperations[x].src2.reg) {
 									if (this.state.dataForwarding) {
+										currentOperations[x].dep2 = currentOperations[i].result
 										// If forwarding is enabled and the previous instruction is not a store or load
 										// and is not in the MEM stage or further in the pipeline, stall.
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
@@ -317,7 +332,7 @@ class App extends Component {
 							// If the destination registers are the same for both instructions and the destination registers
 							// are not equal to "null."  The destination register will only equal "null" for BR and SD 
 							// instructions.
-							else if (currentOperations[i].dest && (currentOperations[i].dest === currentOperations[x].dest)) {
+							else if (!currentOperations[i].completed && currentOperations[i].dest && (currentOperations[i].dest === currentOperations[x].dest)) {
 
 								// If a previous instruction is in the EX stage and the remaining cycles for that
 								// previous instruction is greater than or equal to the current instruction's 
@@ -336,7 +351,7 @@ class App extends Component {
 							// previous instruction is equal to the current instruction's execution cycles minus one.
 							// (The minus one is there because the previous instructions will have already been moved into
 							// their "next" stage while the current instruciton hasn't been executed yet.)
-							else if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
+							else if (!currentOperations[i].completed && (currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
 
 								// *** WB will happen at the same time ***
 								stall = 1;
@@ -349,9 +364,14 @@ class App extends Component {
 							// Move the instruction into the EX stage.
 							currentOperations[x].pipeline_stage = "EX";
 							if (currentOperations[x].operator === 'syscall') {
-								this.printToConsole(processor.getRegister("v0"), processor.getRegister("a0")) // need to correct this
+								if(this.state.dataForwarding){
+									this.printToConsole(currentOperations[x-2].result, currentOperations[x-1].result) // need to correct this for all situations
+								}
+								else{
+									this.printToConsole(processor.getRegister("v0"), processor.getRegister("a0"))
+								}
 							}
-							currentOperations[x] = execute(currentOperations[x])
+							currentOperations[x] = execute(currentOperations[x], this.state.dataForwarding)
 							currentOperations[x].execute_counter++;
 						}
 						break;
@@ -456,6 +476,7 @@ class App extends Component {
 		var instrCell = instrRow.insertCell(0)
 		instrCell.className = `instr-cell row${x}-col${0}`
 		instrCell.innerHTML = instr.join(" ")
+		instrCell.scrollTop = instrCell.scrollHeight
 		for (let i = 1; i <= 5 * x + 5; i++) {
 			var instrNum = instrRow.insertCell(i)
 			instrNum.className = `num-cell row${x}-col${i}`
@@ -471,12 +492,20 @@ class App extends Component {
 
 	onSampleProgramClick = program => {
 		if (program === "bubbleSort") {
-			localStorage.setItem('result', bubbleSort);
+			this.setState({
+				code: bubbleSort
+			})
+		}
+		else if(program === 'sumOfNums'){
+			this.setState({
+				code: sumOfNum
+			})
 		}
 		else {
-			localStorage.setItem('result', sumOfNum)
+			this.setState({
+				code: tryOutPipeline
+			})
 		}
-		window.location.reload();
 	}
 
 	onDataForwardEnable = () => {
@@ -507,6 +536,12 @@ class App extends Component {
 		}
 		this.setState({
 			enableMoreStats: !moreStats
+		})
+	}
+
+	onCodeChange = changedCode => {
+		this.setState({
+			code: changedCode
 		})
 	}
 
@@ -543,6 +578,8 @@ class App extends Component {
 					</div>
 					<div style={{ width: '80%' }}>
 						<IDE
+							onCodeChange={this.onCodeChange}
+							code={this.state.code}
 							pc={this.state.pc}
 						/>
 						<div style={{ height: '1px', backgroundColor: 'white' }}></div>
