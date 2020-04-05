@@ -81,7 +81,7 @@ class App extends Component {
 
 		var table = document.getElementsByClassName("pipeline-screen")
 		table[1].innerHTML = (
-			`<table border='1' id="table-main">
+			`<table border='2' id="table-main">
 				<tr id="cycle-number">
 					<td align='center' nowrap="nowrap" class="instr-cell" id="instr-cell-heading">Cycle/Instruction</td>
 				</tr>
