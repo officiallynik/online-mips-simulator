@@ -6,7 +6,8 @@ Online link: https://mips-online.herokuapp.com/
 * 1. download the zip
 * 2. run "npm install"
 * 3. run "npm start"
-* Node and npm are required to run Simulator locally
+
+*Node and npm are required to run Simulator locally
 
 #### Pipeline Stages
 * 1. Instruction Fetch
@@ -16,7 +17,8 @@ Online link: https://mips-online.herokuapp.com/
 * 5. Writeback
 
 #### Supported instructions
-* ['add', 'addi', 'sub', 'beq', 'bne', 'lw', 'li', 'lui', 'la', 'sw', 'slt', 'slti', 'j', 'jr', 'syscall']
+
+['add', 'addi', 'sub', 'beq', 'bne', 'lw', 'li', 'lui', 'la', 'sw', 'slt', 'slti', 'j', 'jr', 'syscall']
 
 #### Assumptions
 * 1. Each pipeline stage takes 1 clk cycle for any instruction
@@ -29,7 +31,8 @@ Online link: https://mips-online.herokuapp.com/
 * 3. assemble the code
 * 4. use step-run or run to execute the code
 
-* Warning: Do Not Turn On More Stats For Large Programs Like 'Bubble Sort', As Time Taken To Complete The Task May Increase By Large Amount Or System May Hang!!
-* View the instructions in their pipeline stage by enabling and navigating to 'Pipeline' in lower screen
+*Warning: Do Not Turn On More Stats For Large Programs Like 'Bubble Sort', As Time Taken To Complete The Task May Increase By Large Amount Or System May Hang!!
 
-* This simulator is not bug free, feel free to hit a pull request on noticing one or to make improvements
+*View the instructions in their pipeline stage by enabling and navigating to 'Pipeline' in lower screen
+
+*This simulator is not bug free, feel free to hit a pull request on noticing one or to make improvements
