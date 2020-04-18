@@ -167,6 +167,8 @@ class App extends Component {
 		}
 		if (!processor.running) {
 			this.setState({
+				print: this.state.print + "\nEnd of Instructions...",
+				running: 2,
 				performance: {
 					cycles: current_cycle - 1,
 					stalls: stalls
