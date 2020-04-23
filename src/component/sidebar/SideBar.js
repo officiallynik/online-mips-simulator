@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Slider from 'react-input-slider';
 
 import "./SideBar.css";
 const SideBar = props => {
@@ -9,6 +10,26 @@ const SideBar = props => {
     dataSegment: false,
     sampleProgram: false,
     analysis: false
+  })
+
+  var [isCacheConfShow, setIsCacheConfShow] = useState(false)
+
+  var [cacheNumber, setCacheNumber] = useState(1)
+
+  var [l1CacheState, setl1CacheState] = useState({
+    cacheSize: 0,
+    maxCacheSize: 0,
+    blockSize: 0,
+    associativity: 0,
+    latency: 0
+  })
+
+  var [l2CacheState, setl2CacheState] = useState({
+    cacheSize: 0,
+    maxCacheSize: 0,
+    blockSize: 0,
+    associativity: 0,
+    latency: 0
   })
 
 
@@ -46,6 +67,100 @@ const SideBar = props => {
       <div className="pa-program">Number of stalls: {props.performance.stalls}</div>
       <div className="pa-program">IPC: {(1/(1+(props.performance.stalls/props.performance.cycles))).toFixed(2)}</div>
     </div>)
+  }
+  
+  useEffect(() => {
+    if(props.isShowing){
+      setIsOpen({
+        registers: false,
+        dataSegment: false,
+        sampleProgram: false,
+        analysis: false
+      })
+    }
+  }, [props.isShowing])
+
+  useEffect(() => {
+    setIsCacheConfShow(props.isShowing)
+  }, [props.isShowing])
+
+  useEffect(() => {
+    if(isOpen.analysis || isOpen.dataSegment || isOpen.registers || isOpen.sampleProgram){
+      setIsCacheConfShow(false)
+    }
+  }, [isOpen.analysis, isOpen.dataSegment, isOpen.registers, isOpen.sampleProgram])
+
+  const {hideCacheSettings} = props
+
+  useEffect(() => hideCacheSettings(isCacheConfShow), [isCacheConfShow, hideCacheSettings])
+
+  useEffect(() => {
+    setl1CacheState({
+      ...props.l1CacheInfo
+    })
+    setl2CacheState({
+      ...props.l2CacheInfo
+    })
+  }, [props.l1CacheInfo, props.l2CacheInfo])
+
+  var cacheSettingsDisplay = ""
+
+  if(cacheNumber === 1){
+    cacheSettingsDisplay = (
+      <div className="cache-settings">
+        <div>Cache Size : {l1CacheState.cacheSize} Bytes</div>
+        <Slider
+          axis="x"
+          x={l1CacheState.cacheSize}
+          onChange={({ x }) => setl1CacheState(l1CacheState => ({ ...l1CacheState, cacheSize: x }))}
+          xmin={props.l1CacheInfo.cacheSize}
+          xmax={props.l1CacheInfo.maxCacheSize}
+          xstep={Math.pow(2, 4)}
+        />
+        <div>Block Size: {l1CacheState.blockSize} Bytes</div>
+        <Slider
+          axis="x"
+          x={l1CacheState.cacheSize}
+          onChange={({ x }) => setl1CacheState(l1CacheState => ({ ...l1CacheState, cacheSize: x }))}
+          xmin={props.l1CacheInfo.cacheSize}
+          xmax={props.l1CacheInfo.maxCacheSize}
+          xstep={Math.pow(2, 4)}
+        />
+        <div>Associativity: L1</div>
+        <Slider
+          axis="x"
+          x={l1CacheState.cacheSize}
+          onChange={({ x }) => setl1CacheState(l1CacheState => ({ ...l1CacheState, cacheSize: x }))}
+          xmin={props.l1CacheInfo.cacheSize}
+          xmax={props.l1CacheInfo.maxCacheSize}
+          xstep={Math.pow(2, 4)}
+        />
+        <div>Latency: L1</div>
+        <Slider
+          axis="x"
+          x={l1CacheState.cacheSize}
+          onChange={({ x }) => setl1CacheState(l1CacheState => ({ ...l1CacheState, cacheSize: x }))}
+          xmin={props.l1CacheInfo.cacheSize}
+          xmax={props.l1CacheInfo.maxCacheSize}
+          xstep={Math.pow(2, 4)}
+        />
+      </div>
+    )
+  }
+  else{
+    cacheSettingsDisplay = (
+      <div>
+        <div>Cache Size: {l2CacheState.cacheSize}</div>
+        <Slider
+          axis="x"
+          x={l2CacheState.cacheSize}
+          onChange={({ x }) => setl2CacheState(l2CacheState => ({ ...l2CacheState, cacheSize: x }))}
+        />
+        <div>Block Size: L2</div>
+        <div>Associativity: L2</div>
+        <div>Latency: L2</div>
+      </div>
+    )
   }
 
   return (
@@ -141,6 +256,20 @@ const SideBar = props => {
           <div className="s-program" onClick={() => {props.sampleProgram("sumOfNums")}}><span style={{color:'yellow', fontSize:'11px'}}>asm </span>Sum of first 10 natural numbers</div>
           <div className="s-program" onClick={() => {props.sampleProgram("tryOutPipeline")}}><span style={{color:'yellow', fontSize:'11px'}}>asm </span>Try Out Pipeline</div>
         </div>
+      </div>
+
+      <div style={isCacheConfShow? {display: 'block', color:'white'}:{display:'none'}} className="cache-counter">
+          <div className="cache-headers">
+            <span className="cache-labels" style={cacheNumber===1?{backgroundColor: '#696b6a'}:{}}
+            onClick={() => setCacheNumber(1)}
+            >L1 Cache</span>
+            <span className="cache-labels" style={cacheNumber===2?{backgroundColor: '#696b6a'}:{}}
+            onClick={() => setCacheNumber(2)}
+            >L2 Cache</span>
+          </div>
+          <div>
+            {cacheSettingsDisplay}
+          </div>
       </div>
     </div>
   );

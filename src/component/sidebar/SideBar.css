@@ -69,3 +69,29 @@
     padding-left: 30px;
     color: orange;
 }
+
+.cache-settings{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cache-counter{
+    border-top: 2px solid white;
+}
+
+.cache-headers{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.cache-labels{
+    width: 100%;
+    text-align: center;
+}
+
+.cache-labels:hover{
+    background-color: #696b6a;
+    cursor: default;
+}

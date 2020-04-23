@@ -7,6 +7,7 @@ class Navbar extends React.Component{
     state = {
         result: ""
     }
+
     render(){
         var runButton = ""
         if(this.props.running === 1){
@@ -24,17 +25,27 @@ class Navbar extends React.Component{
                     <div className="brand-icon">
                         <i className="fas fa-microchip"></i>
                     </div>
+
                     <div className="nav-item nav-buttons upload">
                         <span className="file">
                             Upload
                             <input type="file" name="file" id ="fileInput" accept=".asm" onChange={this.props.setFile.bind(this)} multiple/>
                         </span>
                     </div>
+
+                    <div className="nav-item nav-buttons" style={this.props.isShowing?{backgroundColor: '#72757a'}:{}}>
+                        <span onClick={() => this.props.toggleCacheSettings()}>
+                            Cache Settings
+                        </span>
+
+                    </div>
+
                     <div className="nav-item nav-buttons"> 
                         <span className="file" onClick={this.props.deleteFile.bind(this)} >
                             Clear
                         </span>
                     </div>
+
 
                     <div className="nav-item nav-buttons" onClick={() => this.props.toggleDF()} style={this.props.dataForw? {backgroundColor: "green"}: {}}> 
                         <span>

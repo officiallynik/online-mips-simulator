@@ -44,7 +44,7 @@
     margin: 0;
 } 
 .nav-buttons:hover{
-    cursor: pointer;
+    cursor: default;
     background-color: #72757a;
 } 
 
@@ -53,4 +53,12 @@
     opacity: 0.8;
     font-weight: 300;
     font-size: 16px;
+}
+
+.dropdown-menu{
+    margin-top: 5px;
+    border-radius: 0%;
+    width: 20%;
+    left: -101px !important;
+    background-color: yellow
 }

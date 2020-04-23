@@ -37,7 +37,22 @@ class App extends Component {
 		running: 0,
 		performance: {},
 		pipeline: [],
-		enableMoreStats: false
+		enableMoreStats: false,
+		l1CacheConfig: {
+			cacheSize: 16,
+			maxCacheSize: 64,
+			blockSize: 2,
+			associativity: 0,
+			latency: 1
+		},
+		l2CacheConfig: {
+			cacheSize: 64,
+			maxCacheSize: 512,
+			blockSize: 2,
+			associativity: 0,
+			latency: 1
+		},
+		showCacheConfig: false
 	}
 
 	// --- logic to upload and clear file ---
@@ -513,6 +528,37 @@ class App extends Component {
 		})
 	}
 
+	configureCache = (level, cacheSize, blockSize, associativity, latency) => {
+		if(level === 1){
+			this.setState({
+				l1CacheConfig: {
+					...this.state.l1CacheConfig,
+					cacheSize: cacheSize,
+					blockSize: blockSize,
+					associativity: associativity,
+					latency: latency
+				}
+			})
+		}
+		else{
+			this.setState({
+				l2CacheConfig: {
+					...this.state.l2CacheConfig,
+					cacheSize: cacheSize,
+					blockSize: blockSize,
+					associativity: associativity,
+					latency: latency
+				}
+			})
+		}
+	}
+
+	onToggleCacheSettings = (show = !this.state.showCacheConfig) => {
+		this.setState({
+			showCacheConfig: show
+		})
+	}
+
 	render = () => {
 		return (
 			<div className="main-screen">
@@ -528,6 +574,8 @@ class App extends Component {
 						running={this.state.running}
 						toggleMS={this.onEnableMoreStats}
 						moreStats={this.state.enableMoreStats}
+						toggleCacheSettings={this.onToggleCacheSettings}
+						isShowing={this.state.showCacheConfig}
 					/>
 				</div>
 				<div className="App">
@@ -542,6 +590,11 @@ class App extends Component {
 							sampleProgram={this.onSampleProgramClick}
 							running={this.state.running}
 							performance={this.state.performance}
+							configureCache={this.configureCache}
+							l1CacheInfo={this.state.l1CacheConfig}
+							l2CacheInfo={this.state.l2CacheConfig}
+							isShowing={this.state.showCacheConfig}
+							hideCacheSettings={this.onToggleCacheSettings}
 						/>
 					</div>
 					<div style={{ width: '80%' }}>
