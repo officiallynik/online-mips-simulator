@@ -286,6 +286,7 @@ class App extends Component {
 							// console.log("I: " + i)
 							if (currentOperations[i].pipeline_stage === "EX" && currentOperations[i].operator === currentOperations[x].operator) {
 								// *** Structural Hazard ***
+								// alert("S1")
 								stall = 1;
 								break;
 							}
@@ -295,14 +296,16 @@ class App extends Component {
 										currentOperations[x].dep1 = currentOperations[i].result
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
+											// alert("S2")				
 											stall = 1;
 											break;
 										}
 									}
 
 									else {
-										if (currentOperations[i].pipeline_stage !== " ") {
+										if (currentOperations[i].pipeline_stage !== " " && !this.state.dataForwarding) {
 											// *** RAW Hazard **
+											// alert("S2b")				
 											stall = 1;
 											break;
 										}
@@ -315,6 +318,7 @@ class App extends Component {
 										currentOperations[x].dep2 = currentOperations[i].result
 										if (currentOperations[i].pipeline_stage !== "MEM" && currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
 											// *** RAW Hazard **
+											// alert("S3")
 											stall = 1;
 											break;
 										}
@@ -322,8 +326,9 @@ class App extends Component {
 
 									else {
 										// If forwarding is disabled and the previous instruction is not completed, stall.
-										if (currentOperations[i].pipeline_stage !== " ") {
+										if (currentOperations[i].pipeline_stage !== " " && !this.state.dataForwarding) {
 											// *** RAW Hazard **
+											// alert("S3b")
 											stall = 1;
 											break;
 										}
@@ -334,6 +339,7 @@ class App extends Component {
 
 								if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) >= 0)) {
 									// *** WAW Hazard ***
+									// alert("S4")
 									stall = 1;
 									break;
 								}
@@ -343,6 +349,7 @@ class App extends Component {
 							else if ((currentOperations[i].pipeline_stage === "EX") && ((1 - currentOperations[i].execute_counter) === 0)) {
 
 								// *** WB will happen at the same time ***
+								// alert("S5")
 								stall = 1;
 								break;
 							}
