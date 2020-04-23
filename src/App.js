@@ -39,18 +39,16 @@ class App extends Component {
 		pipeline: [],
 		enableMoreStats: false,
 		l1CacheConfig: {
-			cacheSize: 16,
-			maxCacheSize: 64,
-			blockSize: 2,
-			associativity: 0,
-			latency: 1
+			cacheSize: 32,
+			blockSize: 8,
+			associativity: 2,
+			latency: 2
 		},
 		l2CacheConfig: {
-			cacheSize: 64,
-			maxCacheSize: 512,
-			blockSize: 2,
-			associativity: 0,
-			latency: 1
+			cacheSize: 128,
+			blockSize: 32,
+			associativity: 4,
+			latency: 4
 		},
 		showCacheConfig: false
 	}

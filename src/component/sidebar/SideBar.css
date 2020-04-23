@@ -71,9 +71,10 @@
 }
 
 .cache-settings{
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    padding-left: 30px;
 }
 
 .cache-counter{
@@ -83,7 +84,10 @@
 .cache-headers{
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+}
+
+.cache-options{
+    margin-bottom: 10px;
 }
 
 .cache-labels{
