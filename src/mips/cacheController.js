@@ -21,29 +21,31 @@ class cacheController{
     }
 
     searchInCacheL1(tag, index, offset){
-        let set = parseInt(index, 2)
-        // console.log(tag, index, offset)
+        let setStartBlk = parseInt(index, 2)*(this.nbLinesL1/Math.pow(2, index.toString().length))
+        // console.log("In L1")
+        // console.log(tag, index, offset, set)
         for(let i=0; i<parseInt(this.nbLinesL1/Math.pow(2, index.toString(2).length)); i++){
-            var fetchedTag = this.tagL1[set + i]
+            var fetchedTag = this.tagL1[setStartBlk + i]
             // console.log((set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2))
             if(tag === fetchedTag){
-                return this.dataL1[(set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2)]
+                // console.log("String Found at idx " + (((set + i)*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2)))
+                return this.dataL1[((setStartBlk + i)*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2)]
             }
         }      
         return null
     }
 
     searchInCacheL2(tag, index, offset, nbBlocks){
-        let set = parseInt(index, 2)
+        let setStartBlk = parseInt(index, 2)*(this.nbLinesL1/Math.pow(2, index.toString().length))
         // console.log("NBBlocks: " + this.nbLinesL1/Math.pow(2, index.toString(2).length))
         for(let i=0; i<this.nbLinesL1/Math.pow(2, index.toString(2).length); i++){
-            var fetchedTag = this.tagL1[set + i]
+            var fetchedTag = this.tagL1[setStartBlk + i]
             // console.log(set*this.nbLinesL1/Math.pow(2, index.toString(2).length)*Math.pow(2, offset.length) + i + parseInt(offset, 2))
             if(tag === fetchedTag){
                 var startBlk = parseInt(offset, 2) - (parseInt(offset, 2) % nbBlocks)
                 var data = []
                 for(let j=0; j<nbBlocks; j++){
-                    data.push(this.dataL1[(set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + startBlk + j])
+                    data.push(this.dataL1[(setStartBlk + i)*Math.pow(2, this.offsetBitsL2) + startBlk + j])
                 }
                 return data
             }
@@ -51,10 +53,25 @@ class cacheController{
         return null
     }
 
-    writeToCacheL1(tag, index, data, cycle){
+    writeToCacheL1(tag, index, data, cycle, offset = null){
         // console.log(data)
+
+        
         let set = parseInt(index, 2)
+        
         let startBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length)))
+        
+        // if same tag is present
+        for(let i=startBlk; i<startBlk+this.nbLinesL1/Math.pow(2, index.toString(2).length) && offset!==null; i++){
+            if(this.tagL1[i] === tag){
+                this.dataL1[i*Math.pow(2, offset.toString().length) + parseInt(offset, 2)] = data
+                this.tagL1[i] = tag
+                this.cntL1[i] = cycle
+                return
+            }
+        }
+
+        // finding empty or LRU blk and replacing
         let i =  startBlk + 1
         // console.log("StartBlk: " + startBlk)
         let lruBlk = 0
@@ -76,20 +93,20 @@ class cacheController{
     }
 
     writeToCacheL2(addr, data, cycle){
-        console.log("EvictedData: " + addr)
-        console.log(data)
+        // console.log("EvictedData: " + addr)
+        // console.log(data)
 
         let offset = addr.slice(32-this.offsetBitsL2)
         let index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
         let tag = addr.slice(0, this.tagBitsL2)
 
-        console.log(tag, index, offset)
+        // console.log(tag, index, offset)
 
         let set = parseInt(index, 2)
-        let startBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length)))
+        let startBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length)))
         
         // if empty space or same tag is present
-        for(let i=startBlk; i<startBlk+this.nbLinesL1/Math.pow(2, index.toString(2).length); i++){
+        for(let i=startBlk; i<startBlk+this.nbLinesL2/Math.pow(2, index.toString(2).length); i++){
             if(this.tagL2[i] === undefined || this.tagL2[i] === tag){
                 this.dataL2.splice(i*Math.pow(2, this.offsetBitsL2) + parseInt(offset, 2), data.length, ...data)
                 this.tagL2[i] = tag
@@ -110,27 +127,45 @@ class cacheController{
         }
         // console.log("lruBlk: " + lruBlk)
         let blk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL2)) + (lruBlk*Math.pow(2, this.offsetBitsL2))
-        this.dataL1.splice(blk, data.length, ...data)
-        let tagBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))) + lruBlk
-        this.tagL1[tagBlk] = tag
-        this.cntL1[tagBlk] = cycle
+        this.dataL2.splice(blk, data.length, ...data)
+        let tagBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length))) + lruBlk
+        this.tagL2[tagBlk] = tag
+        this.cntL2[tagBlk] = cycle
     }
 
     readFromCache(addr, currentCycle){
+        console.log("Given Dec Addr: ", addr)
+        addr = addr + 268500992
+        addr = addr.toString(2) // 268500992 -> the start addr
+        
+        for(let i=addr.length; i<32; i++){
+            addr = "0" + addr
+        }
+        console.log("In ReadFromCache : ", addr, currentCycle)
+
+        // console.log("Addr: " + addr)
+
+        // console.log("Searching CacheL1")
         var offset1 = addr.slice(32-this.offsetBitsL1)
         var index1 = addr.slice(32-(this.offsetBitsL1 + this.indexBitsL1), 32-this.offsetBitsL1)
         var tag1 = addr.slice(0, this.tagBitsL1)
-        // console.log(tag, index, offset)
        
         var data = this.searchInCacheL1(tag1, index1, offset1)
+
+        // console.log("L1Data: ")
+        // console.log(data)
         
         // the search in CacheL1
         if(data === null){
+            // console.log("Searching CacheL2")
             let offset = addr.slice(32-this.offsetBitsL2)
             let index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
             let tag = addr.slice(0, this.tagBitsL2)
             
             data = this.searchInCacheL2(tag, index, offset, Math.pow(2, this.offsetBitsL1))
+
+            // console.log("L2Data: ")
+            // console.log(data)
 
             if(data !== null){
                 this.writeToCacheL1(tag1, index1, data, currentCycle)
@@ -140,10 +175,67 @@ class cacheController{
 
         // the search in main memory
         if(data === null){
+            // console.log("Searching Main Memory")
+            let nbBlocks = Math.pow(2, this.offsetBitsL1)
+            data = []
+            addr = (parseInt(addr, 2) - 268500992)
+            addr = addr - addr % Math.pow(2, this.offsetBitsL1)
+            data = []
+            for(let i=0; i<nbBlocks; i++){
+                // console.log(" Getting Data at: " + (addr + i))
+                data.push(processor.memory[addr + i])
+            }
+            // console.log("MM Data: ")
+            // console.log(data)
+            this.writeToCacheL1(tag1, index1, data, currentCycle)
 
+            data = data[parseInt(offset1, 2)]
         }
 
-        return data
+        // console.log("Final Data: ")
+        // console.log(parseInt(data, 2))
+        console.log("Fetched Value = ", parseInt(data, 2))
+        return parseInt(data, 2)
+    }
+
+    writeThrough(addr, data, currentCycle){
+        console.log("Given DecAddr: ", addr)
+        // check for the presence of data addr in cacheL1 and update
+        addr = addr + 268500992
+        addr = addr.toString(2) // 268500992 -> the start addr
+
+        for(let i=addr.length; i<32; i++){
+            addr = "0" + addr
+        }
+
+        console.log("In WriteThrough ", addr, currentCycle)
+        console.log("Writing Val = ", data)
+
+        var offset = addr.slice(32-this.offsetBitsL1)
+        var index = addr.slice(32-(this.offsetBitsL1 + this.indexBitsL1), 32-this.offsetBitsL1)
+        var tag = addr.slice(0, this.tagBitsL1)
+
+        var dataFetched = this.searchInCacheL1(tag, index, offset)
+        if(dataFetched !== null){
+            console.log("FetchedData: ")
+            console.log(dataFetched)
+            // dataFetched[parseInt(offset, 2)] = data
+            this.writeToCacheL1(tag, index, data, currentCycle, offset)
+        }
+
+        // check for the presence of data addr in cacheL2 and update
+        offset = addr.slice(32-this.offsetBitsL2)
+        index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
+        tag = addr.slice(0, this.tagBitsL2)
+
+        dataFetched = this.searchInCacheL2(tag, index, offset, 1)
+        if(dataFetched !== null){
+            this.writeToCacheL2(offset.toString()+index.toString()+tag.toString(), data, currentCycle)
+        }
+
+        // update the contents of main memory
+        addr = (parseInt(addr, 2) - 268500992)
+        processor.memory[addr] = data
     }
 }
 

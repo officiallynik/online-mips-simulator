@@ -1,7 +1,7 @@
 // WB stage with functionality
 import processor from '../processor'
 
-const writeBack = instr => {
+const writeBack = (instr, cacheController, currentCycle) => {
     // console.log("WB", instr)
     if(instr["result"] !== undefined && instr["dest"] !== undefined){ 
         // console.log(instr.dest, instr.result)
@@ -16,7 +16,8 @@ const writeBack = instr => {
             val = "0" + val
         }
         
-        processor.memory[addr] = val
+        // processor.memory[addr] = val
+        cacheController.writeThrough(addr, val, currentCycle)
     }
     if(instr.operator === "jr"){
         processor.running = false

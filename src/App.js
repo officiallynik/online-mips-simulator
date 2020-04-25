@@ -11,7 +11,7 @@ import { bubbleSort, sumOfNum, tryOutPipeline } from './samplePrograms'
 // importing from mips
 import processor from './mips/processor'
 import parser from './mips/parser'
-// import cacheController from "./mips/cacheController";
+import cacheController from "./mips/cacheController";
 import instrFetch from './mips/stages.js/instructionFetch'
 import instrDecodeRegFetch from './mips/stages.js/instructionDecodeAndRegisterFetch'
 import execute from './mips/stages.js/execute'
@@ -23,6 +23,7 @@ var currentOperations = []
 var current_cycle = 1
 var stalls = 0
 var stalled = 0
+var cacheControl = null
 
 class App extends Component {
 
@@ -51,7 +52,7 @@ class App extends Component {
 			associativity: 2,
 			latency: 4
 		},
-		showCacheConfig: false
+		showCacheConfig: false,
 	}
 
 	// --- logic to upload and clear file ---
@@ -78,21 +79,32 @@ class App extends Component {
 			code: ""
 		})
 	}
+	
+	// cache configure
+	CacheConfigure = () => {
+		cacheControl = new cacheController(this.state.l1CacheConfig, this.state.l2CacheConfig)
+	}
 
 	// --- assemble the code from file ---
 	assemble = () => {
 		processor.reset()
 		parser.reset()
+
+		this.CacheConfigure()
 		// const cache = new cacheController(this.state.l1CacheConfig, this.state.l2CacheConfig)
+
+		// this.setState({
+		// 	cacheController: cache
+		// })
+
 		// console.log(cache.dataL1, cache.dataL2)		
-		// // cache.readFromCache("10101010100010010100100011110110")
+		// cache.readFromCache("10101010100010010100100011110110")
 		// cache.writeToCacheL1("101010101000100101001000111101", "1", [36, 72], 10)
 		// cache.writeToCacheL1("101010101000100101001000110101", "1", [108, 144], 11)
 		// cache.writeToCacheL1("101010101000100101001000001101", "0", [0, 18], 12)
 		// cache.writeToCacheL1("101010101000100101001100001101", "1", [1, 2], 13)
 		// cache.writeToCacheL1("101010101000100101001100001111", "0", [111, 1111], 14)
 		// cache.writeToCacheL1("101010101000100101001100001111", "0", [1199, 1991], 15)
-
 		// console.log(cache.cntL1, cache.dataL1)
 		// console.log(cache.cntL2, cache.dataL2)
 
@@ -104,7 +116,7 @@ class App extends Component {
 		current_cycle = 1
 		stalls = 0
 		stalled = 0
-
+		
 		var table = document.getElementsByClassName("pipeline-screen")
 		table[1].innerHTML = (
 			`<table border='2' id="table-main">
@@ -135,7 +147,28 @@ class App extends Component {
 		this.setState({
 			print: this.state.print + "Successfully Assembled...\n"
 		})
+
+		// cache.readFromCache(268500992, 1) // 6 -> 6, 10
+		// cache.readFromCache(268500996, 2) // 10
+		// cache.readFromCache(268501000, 3) // 8 -> 8, 1
+		// cache.readFromCache(268501004, 4) // 1
+		// cache.readFromCache(268501008, 5) // 4 -> 4, 2
+		// cache.readFromCache(268501012, 6) // 2
+		// cache.readFromCache(268501016, 7) // 9 -> 9, 3
+		// cache.readFromCache(268501020, 8) // 3
+		// cache.readFromCache(268501024, 9) // 5 -> 5, 7
+		// cache.readFromCache(268501028, 10) // 7
+
+		// console.log(cache.tagL1)
+		// console.log(cache.cntL1)
+		// console.log(cache.dataL1)
+
+		// console.log(cache.tagL2)
+		// console.log(cache.cntL2)
+		// console.log(cache.dataL2)
+
 	}
+
 
 	// --- execute in single step using repeated step-run
 	Execute = () => {
@@ -378,19 +411,19 @@ class App extends Component {
 									this.printToConsole(processor.getRegister("v0"), processor.getRegister("a0"))
 								}
 							}
-							currentOperations[x] = execute(currentOperations[x], this.state.dataForwarding)
+							currentOperations[x] = execute(currentOperations[x], cacheControl, current_cycle)
 							currentOperations[x].execute_counter++;
 						}
 						break;
 
 					case "EX":
 						currentOperations[x].pipeline_stage = "MEM";
-						memory(currentOperations[x])
+						memory(currentOperations[x], cacheControl, current_cycle)
 						break;
 
 					case "MEM":
 						currentOperations[x].pipeline_stage = "WB";
-						currentOperations[x] = writeBack(currentOperations[x])
+						currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
 						break;
 
 					case "WB":

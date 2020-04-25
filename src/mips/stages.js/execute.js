@@ -2,7 +2,7 @@
 
 import processor from "../processor"
 
-const execution = instr => {
+const execution = (instr, cacheController, currentCycle) => {
     // console.log("EX", instr)
         // alert("DF")
         switch (instr.operator) {
@@ -88,11 +88,11 @@ const execution = instr => {
                 }
                 // console.log(instr)
                 const addr = (src1 - 268500992)/4 + parseInt(instr.offset/4)
-                const val =  processor.memory[addr]
-                const valDec = parseInt(val, 2)
+                // const val =  processor.memory[addr]
+                // const valDec = parseInt(val, 2)
 
                 // console.log(valDec, addr, val)
-                instr.result = valDec
+                instr.result = cacheController.readFromCache(addr, currentCycle)
                 break
             case 'li':
                 instr.result = instr.val

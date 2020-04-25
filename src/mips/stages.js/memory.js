@@ -2,7 +2,7 @@
 
 import processor from '../processor'
 
-const memory = instr => {
+const memory = (instr, cacheController, currentCycle) => {
     // console.log("MEM", instr)
     if (instr.operator === 'lw') {
         // console.log(instr)
@@ -15,12 +15,12 @@ const memory = instr => {
         }
 
         const addr = (src1 - 268500992)/4 + parseInt(instr.offset/4)
-        const val = processor.memory[addr]
-        const valDec = parseInt(val, 2)
+        // const val = processor.memory[addr]
+        // const valDec = parseInt(val, 2)
 
         // console.log(addr, val, valDec)
-        instr.result = valDec
-        processor.setRegister(instr.dest, valDec)
+        instr.result = cacheController.readFromCache(addr, currentCycle)
+        processor.setRegister(instr.dest, instr.result)
     }
     else if (instr.operator === 'li' || instr.operator === 'lui') {
         // console.log("LIing")
