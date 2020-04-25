@@ -24,11 +24,8 @@ const SideBar = props => {
   });
 
   var dataSegment = []
-  for (let i = 0; i < props.memoryUsed; i += 4) {
-    var bin = ""
-    for (let j = i; j < 4 + i; j++) {
-      bin += props.dataSegment[j]
-    }
+  for (let i = 0; i < props.memoryUsed/4; i++) {
+    var bin = props.dataSegment[i]
     dataSegment.push({
       dec: parseInt(bin, 2),
       bin: bin

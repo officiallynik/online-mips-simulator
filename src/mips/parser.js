@@ -42,13 +42,14 @@ parser.parse = code => {
           for (let i = 0; i < 32 - len; i++) {
             val = "0" + val;
           }
-          // console.log(val)
-          processor.memory[parser.memPtr] = val.slice(0, 8);
-          processor.memory[parser.memPtr + 1] = val.slice(8, 16);
-          processor.memory[parser.memPtr + 2] = val.slice(16, 24);
-          processor.memory[parser.memPtr + 3] = val.slice(24, 32);
+          // console.log("Val: " + val)
+          // console.log(parser.memPtr)
+          processor.memory[parser.memPtr] = val
+          // processor.memory[parser.memPtr + 1] = val.slice(8, 16);
+          // processor.memory[parser.memPtr + 2] = val.slice(16, 24);
+          // processor.memory[parser.memPtr + 3] = val.slice(24, 32);
 
-          parser.memPtr += 4;
+          parser.memPtr += 1;
         }
       });
     }

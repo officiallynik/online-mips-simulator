@@ -602,7 +602,7 @@ class App extends Component {
 							clicked={this.state.clicked}
 							onNavClick={this.onSideNavClick}
 							dataSegment={processor.memory}
-							memoryUsed={parser.memPtr}
+							memoryUsed={parser.memPtr * 4}
 							sampleProgram={this.onSampleProgramClick}
 							running={this.state.running}
 							performance={this.state.performance}

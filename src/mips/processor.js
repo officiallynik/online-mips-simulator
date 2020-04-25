@@ -1,6 +1,6 @@
 var processor = {
     running: true,
-    memory: new Array(1024*4).fill(0),
+    memory: new Array(1024),
     instrLabels: {},
     dataLables: {},
     // wordAddr: [],
@@ -59,7 +59,7 @@ processor.getRegister = (reg) => {
 
 processor.reset = () => {
     processor.running = true
-    processor.memory = new Array(1024*4).fill(0)
+    processor.memory = new Array(1024)
     processor.dataLables = {}
     processor.instrLabels = {}
     processor.pc = 0

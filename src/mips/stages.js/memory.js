@@ -14,12 +14,12 @@ const memory = instr => {
             instr.dep1 = ""
         }
 
-        const addr = parseInt((src1) + (instr.offset * 4)) - 268500992
-        const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
+        const addr = (src1 - 268500992)/4 + parseInt(instr.offset/4)
+        const val = processor.memory[addr]
         const valDec = parseInt(val, 2)
 
         // console.log(addr, val, valDec)
-
+        instr.result = valDec
         processor.setRegister(instr.dest, valDec)
     }
     else if (instr.operator === 'li' || instr.operator === 'lui') {

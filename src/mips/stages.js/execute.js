@@ -79,32 +79,31 @@ const execution = instr => {
                 res = parseInt(src1) < parseInt(instr.val) 
                 instr.result = res? 1 : 0
                 break
-            case 'li' || 'lw' || 'la' || 'lui':
-                if(instr.operator === 'li'){
-                    instr.result = instr.val
-                }
-                else if(instr.operator === 'lui'){
-                    instr.result = instr.val << 16
-                }
-                else if(instr.operator === 'la'){
-                    instr.result = instr.addr
-                }
-                else{
-                    src1 = instr.src1.val
+            case 'lw':
+                src1 = instr.src1.val
 
-                    if (instr.dep1 !== undefined && instr.dep1 !== "") {
-                        src1 = instr.dep1
-                        instr.dep1 = ""
-                    }
-
-                    const addr = parseInt((src1) + (instr.offset * 4)) - 268500992
-                    const val = processor.memory[addr] + processor.memory[addr + 1] + processor.memory[addr + 2] + processor.memory[addr + 3]
-                    const valDec = parseInt(val, 2)
-
-                    instr.result = valDec
-                    
+                if (instr.dep1 !== undefined && instr.dep1 !== "") {
+                    src1 = instr.dep1
+                    instr.dep1 = ""
                 }
+                // console.log(instr)
+                const addr = (src1 - 268500992)/4 + parseInt(instr.offset/4)
+                const val =  processor.memory[addr]
+                const valDec = parseInt(val, 2)
+
+                // console.log(valDec, addr, val)
+                instr.result = valDec
                 break
+            case 'li':
+                instr.result = instr.val
+                break
+            case 'lui':
+                instr.result = instr.val << 16
+                break
+            case 'la':
+                instr.result = instr.addr
+                break
+
             default: break;
         }
     return instr
