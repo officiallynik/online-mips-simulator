@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Slider from 'react-input-slider';
 
 import "./SideBar.css";
 const SideBar = props => {
@@ -88,66 +87,53 @@ const SideBar = props => {
     AssociativityL1 = ""
   }
 
-  var {cacheSize, blockSize, associativity, latency} = props.l1CacheInfo
+  var AssociativityL2 = ""
+  if(props.l2CacheInfo.associativity === 0){
+    AssociativityL2 = (<span>(Fully Associative)</span>)
+  }
+  else if(props.l2CacheInfo.associativity === props.l2CacheInfo.cacheSize/props.l2CacheInfo.blockSize){
+    AssociativityL2 = (<span>(Direct Mapped)</span>)
+  }
+  else{
+    AssociativityL2 = ""
+  }
 
+  
   var cacheSettingsDisplay = ""
-
+  
   if(cacheNumber === 1){
     cacheSettingsDisplay = (
       <div className="cache-settings">
         <div className="cache-options">
-          <div>Cache Size : {props.l1CacheInfo.cacheSize} Bytes</div>
-          <Slider
-            axis="x"
-            x={props.l1CacheInfo.cacheSize}
-            onChange={({ x }) => props.configureCache(1, x, blockSize, associativity, latency)}
-            xmin={16}
-            xmax={64}
-            xstep={Math.pow(2, 4)}
-          />
+          <div>Cache Size : <span className="display-value"> Bytes</span></div>
         </div>
         <div className="cache-options">
-          <div>Block Size: {props.l1CacheInfo.blockSize} Bytes</div>
-          <Slider
-            axis="x"
-            x={props.l1CacheInfo.blockSize}
-            onChange={({ x }) => props.configureCache(1, cacheSize, x, associativity, latency)}
-            xmin={4}
-            xmax={32}
-            xstep={Math.pow(2, 2)}
-          />
+          <div>Block Size: <span className="display-value">{props.l1CacheInfo.blockSize} Bytes</span></div>
         </div>
         <div className="cache-options">
-          <div>Associativity: {props.l1CacheInfo.associativity} {AssociativityL1}</div>
-          <Slider
-            axis="x"
-            x={props.l1CacheInfo.associativity}
-            onChange={({ x }) => props.configureCache(1, cacheSize, blockSize, x, latency)}
-            xmin={0}
-            xmax={props.l1CacheInfo.cacheSize/props.l1CacheInfo.blockSize}
-            xstep={2}
-          />
+          <div>Associativity: {AssociativityL1} <span className="display-value">{props.l1CacheInfo.associativity} Way(s)</span></div>
         </div>
         <div className="cache-options">
-          <div>Latency: {props.l1CacheInfo.latency}</div>
-          <Slider
-            axis="x"
-            x={props.l1CacheInfo.latency}
-            onChange={({ x }) => props.configureCache(1, cacheSize, blockSize, associativity, x)}
-            xmin={2}
-            xmax={4}
-          />
+          <div>Latency: <span className="display-value">{props.l1CacheInfo.latency} Cycles</span></div>
         </div>
       </div>
     )
   }
   else{
     cacheSettingsDisplay = (
-      <div>
-        <div>Cache Size: L2</div>
-        <div>Block Size: L2</div>
-        <div>Associativity: L2</div>
-        <div>Latency: L2</div>
+      <div className="cache-settings">
+        <div className="cache-options">
+          <div>Cache Size : <span>{props.l2CacheInfo.cacheSize} Bytes</span></div>
+        </div>
+        <div className="cache-options">
+          <div>Block Size: {props.l2CacheInfo.blockSize} Bytes</div>
+        </div>
+        <div className="cache-options">
+          <div>Associativity: {props.l2CacheInfo.associativity} {AssociativityL2}</div>
+        </div>
+        <div className="cache-options">
+          <div>Latency: {props.l2CacheInfo.latency} Cycles</div>
+        </div>
       </div>
     )
   }

@@ -11,6 +11,7 @@ import { bubbleSort, sumOfNum, tryOutPipeline } from './samplePrograms'
 // importing from mips
 import processor from './mips/processor'
 import parser from './mips/parser'
+// import cacheController from "./mips/cacheController";
 import instrFetch from './mips/stages.js/instructionFetch'
 import instrDecodeRegFetch from './mips/stages.js/instructionDecodeAndRegisterFetch'
 import execute from './mips/stages.js/execute'
@@ -47,7 +48,7 @@ class App extends Component {
 		l2CacheConfig: {
 			cacheSize: 128,
 			blockSize: 32,
-			associativity: 4,
+			associativity: 2,
 			latency: 4
 		},
 		showCacheConfig: false
@@ -82,6 +83,18 @@ class App extends Component {
 	assemble = () => {
 		processor.reset()
 		parser.reset()
+		// const cache = new cacheController(this.state.l1CacheConfig, this.state.l2CacheConfig)
+		// console.log(cache.dataL1, cache.dataL2)		
+		// // cache.readFromCache("10101010100010010100100011110110")
+		// cache.writeToCacheL1("101010101000100101001000111101", "1", [36, 72], 10)
+		// cache.writeToCacheL1("101010101000100101001000110101", "1", [108, 144], 11)
+		// cache.writeToCacheL1("101010101000100101001000001101", "0", [0, 18], 12)
+		// cache.writeToCacheL1("101010101000100101001100001101", "1", [1, 2], 13)
+		// cache.writeToCacheL1("101010101000100101001100001111", "0", [111, 1111], 14)
+		// cache.writeToCacheL1("101010101000100101001100001111", "0", [1199, 1991], 15)
+
+		// console.log(cache.cntL1, cache.dataL1)
+		// console.log(cache.cntL2, cache.dataL2)
 
 		this.setState({
 			running: 0
@@ -537,7 +550,6 @@ class App extends Component {
 		if(level === 1){
 			this.setState({
 				l1CacheConfig: {
-					...this.state.l1CacheConfig,
 					cacheSize: cacheSize,
 					blockSize: blockSize,
 					associativity: associativity,
@@ -545,10 +557,9 @@ class App extends Component {
 				}
 			})
 		}
-		else{
+		if(level === 2){
 			this.setState({
 				l2CacheConfig: {
-					...this.state.l2CacheConfig,
 					cacheSize: cacheSize,
 					blockSize: blockSize,
 					associativity: associativity,

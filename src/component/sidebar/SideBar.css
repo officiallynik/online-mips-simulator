@@ -99,3 +99,8 @@
     background-color: #696b6a;
     cursor: default;
 }
+
+.display-value{
+    padding-right: 30px;
+    float: right;
+}
