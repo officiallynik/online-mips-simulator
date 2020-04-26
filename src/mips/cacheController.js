@@ -18,6 +18,11 @@ class cacheController{
         this.tagL2 = new Array(this.nbLinesL2)
         this.cntL2 = new Array(this.nbLinesL2).fill(0)
         this.dataL2 = new Array(l2CacheConfig.cacheSize/4)
+
+        this.hitsL1 = 0
+        this.missL1 = 0
+        this.hitsL2 = 0
+        this.missL2 = 0
     }
 
     searchInCacheL1(tag, index, offset){
@@ -152,6 +157,7 @@ class cacheController{
        
         var data = this.searchInCacheL1(tag1, index1, offset1)
         var foundAt = "l1"
+        this.hitsL1++
         // console.log("L1Data: ")
         // console.log(data)
         
@@ -164,6 +170,9 @@ class cacheController{
             
             data = this.searchInCacheL2(tag, index, offset, Math.pow(2, this.offsetBitsL1))
             foundAt = "l2"
+            this.missL1++
+            this.hitsL1--
+            this.hitsL2++
             // console.log("L2Data: ")
             // console.log(data)
 
@@ -185,6 +194,8 @@ class cacheController{
                 data.push(processor.memory[addr + i])
             }
             foundAt = "mm"
+            this.hitsL2--
+            this.missL2++
             // console.log("MM Data: ")
             // console.log(data)
             this.writeToCacheL1(tag1, index1, data, currentCycle)

@@ -93,22 +93,6 @@ class App extends Component {
 		parser.reset()
 		numCompInstr = 0
 		this.CacheConfigure()
-		// const cache = new cacheController(this.state.l1CacheConfig, this.state.l2CacheConfig)
-
-		// this.setState({
-		// 	cacheController: cache
-		// })
-
-		// console.log(cache.dataL1, cache.dataL2)		
-		// cache.readFromCache("10101010100010010100100011110110")
-		// cache.writeToCacheL1("101010101000100101001000111101", "1", [36, 72], 10)
-		// cache.writeToCacheL1("101010101000100101001000110101", "1", [108, 144], 11)
-		// cache.writeToCacheL1("101010101000100101001000001101", "0", [0, 18], 12)
-		// cache.writeToCacheL1("101010101000100101001100001101", "1", [1, 2], 13)
-		// cache.writeToCacheL1("101010101000100101001100001111", "0", [111, 1111], 14)
-		// cache.writeToCacheL1("101010101000100101001100001111", "0", [1199, 1991], 15)
-		// console.log(cache.cntL1, cache.dataL1)
-		// console.log(cache.cntL2, cache.dataL2)
 
 		this.setState({
 			running: 0
@@ -149,26 +133,6 @@ class App extends Component {
 		this.setState({
 			print: this.state.print + "Successfully Assembled...\n"
 		})
-
-		// cache.readFromCache(268500992, 1) // 6 -> 6, 10
-		// cache.readFromCache(268500996, 2) // 10
-		// cache.readFromCache(268501000, 3) // 8 -> 8, 1
-		// cache.readFromCache(268501004, 4) // 1
-		// cache.readFromCache(268501008, 5) // 4 -> 4, 2
-		// cache.readFromCache(268501012, 6) // 2
-		// cache.readFromCache(268501016, 7) // 9 -> 9, 3
-		// cache.readFromCache(268501020, 8) // 3
-		// cache.readFromCache(268501024, 9) // 5 -> 5, 7
-		// cache.readFromCache(268501028, 10) // 7
-
-		// console.log(cache.tagL1)
-		// console.log(cache.cntL1)
-		// console.log(cache.dataL1)
-
-		// console.log(cache.tagL2)
-		// console.log(cache.cntL2)
-		// console.log(cache.dataL2)
-
 	}
 
 
@@ -190,7 +154,11 @@ class App extends Component {
 					running: 2,
 					performance: {
 						cycles: current_cycle - 1,
-						stalls: stalls
+						stalls: stalls,
+						l1CacheHits: cacheControl.hitsL1,
+						l1CacheMiss: cacheControl.missL1,
+						l2CacheHits: cacheControl.hitsL2,
+						l2CacheMiss: cacheControl.missL2,
 					}
 				})
 				window.clearInterval(run)
@@ -232,7 +200,11 @@ class App extends Component {
 				running: 2,
 				performance: {
 					cycles: current_cycle - 1,
-					stalls: stalls
+					stalls: stalls,
+					l1CacheHits: cacheControl.hitsL1,
+					l1CacheMiss: cacheControl.missL1,
+					l2CacheHits: cacheControl.hitsL2,
+					l2CacheMiss: cacheControl.missL2,
 				}
 			})
 			// console.clear()
@@ -442,6 +414,52 @@ class App extends Component {
 								stall = 1;
 								break;
 							}
+
+							if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
+								if (currentOperations[i].dest === currentOperations[x].src1.reg) {
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
+										currentOperations[x].dep1 = currentOperations[i].result
+										if (currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											// alert("S2")				
+											stall = 1;
+											break;
+										}
+									}
+
+									else {
+										if (currentOperations[i].pipeline_stage !== " " && !this.state.dataForwarding) {
+											// *** RAW Hazard **
+											// alert("S2b")				
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
+							else if (currentOperations[i].dest !== undefined && currentOperations[x].src2 !== undefined) {
+								if (currentOperations[i].dest === currentOperations[x].src2.reg) {
+									if (!currentOperations[i].completed && this.state.dataForwarding) {
+										currentOperations[x].dep2 = currentOperations[i].result
+										if (currentOperations[i].pipeline_stage !== "WB" && currentOperations[i].pipeline_stage !== " ") {
+											// *** RAW Hazard **
+											// alert("S3")
+											stall = 1;
+											break;
+										}
+									}
+
+									else {
+										// If forwarding is disabled and the previous instruction is not completed, stall.
+										if (currentOperations[i].pipeline_stage !== " " && !this.state.dataForwarding) {
+											// *** RAW Hazard **
+											// alert("S3b")
+											stall = 1;
+											break;
+										}
+									}
+								}
+							}
 						}
 						// If no stalls have been detected.
 						if(currentOperations[x].operator === "lw"){
@@ -450,6 +468,9 @@ class App extends Component {
 						}
 						else if (stall !== 1) {
 							// Move the instruction into the EX stage.
+							if(currentOperations[x].operator === "sw"){
+								currentOperations[x].strCounter = 0
+							}
 							currentOperations[x].pipeline_stage = "MEM";
 							memory(currentOperations[x], cacheControl, current_cycle)
 						}
@@ -457,29 +478,62 @@ class App extends Component {
 						break;
 
 					case "MEM":
-						if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
-							currentOperations[x].memoryCounter++;
+						for(let i=(x-1); i>=numCompInstr; i--){
+							// *** Structural Hazard ***
+							if (currentOperations[i].operator === "sw" && currentOperations[i].strCounter <= this.state.mainMemoryLatency) {
+								stall = 1;
+								break;
+							}
 						}
 
-						if (currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter < currentOperations[x].memoryLatency){
-							currentOperations[x].pipeline_stage = "MEM";
-							currentOperations[x].memoryCounter++;	
-						}
-						else{
-							currentOperations[x].pipeline_stage = "WB";
-							currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
+						// If no stalls have been detected.
+						if (stall !== 1) {
+							if(currentOperations[x].operator === "sw"){
+								currentOperations[x].pipeline_stage = "WB";
+								currentOperations[x].strCounter++
+							}
+							// Move the instruction into the EX stage.
+							else if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
+								currentOperations[x].memoryCounter++;
+							}
+							else if (currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter < currentOperations[x].memoryLatency){
+								currentOperations[x].pipeline_stage = "MEM";
+								currentOperations[x].memoryCounter++;	
+							}
+							else{
+								currentOperations[x].pipeline_stage = "WB";
+								currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
+							}
+	
+							if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
+								currentOperations[x].pipeline_stage = "MEM";
+								memory(currentOperations[x], cacheControl, current_cycle)
+							}
 						}
 
-						if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
-							currentOperations[x].pipeline_stage = "MEM";
-							memory(currentOperations[x], cacheControl, current_cycle)
-						}
+
 						break;
 
 					case "WB":
 						// Complete the execution of this instruction.
-						numCompInstr++
-						currentOperations[x].pipeline_stage = " ";
+						if(currentOperations[x].operator === 'sw' && currentOperations[x].strCounter === this.state.mainMemoryLatency){
+							currentOperations[x].strCounter++;
+							currentOperations[x].pipeline_stage = " ";
+						}
+
+						if(currentOperations[x].operator === 'sw' && currentOperations[x].strCounter < this.state.mainMemoryLatency){
+							currentOperations[x].strCounter++
+							currentOperations[x].pipeline_stage = "WB"
+						}
+						else{
+							numCompInstr++
+							currentOperations[x].pipeline_stage = " ";
+						}
+
+						if(currentOperations[x].operator === "sw" && currentOperations[x].strCounter === this.state.mainMemoryLatency){
+							currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
+						}
+
 						break;
 
 					case " ":

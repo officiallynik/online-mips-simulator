@@ -41,10 +41,26 @@ const SideBar = props => {
     performance = <span className="pa-program">Running...</span>
   }
   else{
+    let pert = "%"
+    let l1MissRate = ((props.performance.l1CacheMiss/(props.performance.l1CacheMiss + props.performance.l1CacheHits))*100).toString().slice(0, 3)
+    if(isNaN(l1MissRate)){
+      l1MissRate = "Memory Not Accessed"
+      pert = ""
+    }
+    let l2MissRate = ((props.performance.l2CacheMiss/(props.performance.l2CacheHits + props.performance.l2CacheMiss))*100).toString().slice(0, 3)
+    if(isNaN(l2MissRate)){
+      l2MissRate = "Memory Not Accessed"
+    }
     performance = (<div>
       <div className="pa-program">Number of cycles: {props.performance.cycles}</div>
       <div className="pa-program">Number of stalls: {props.performance.stalls}</div>
       <div className="pa-program">IPC: {(1/(1+(props.performance.stalls/props.performance.cycles))).toFixed(2)}</div>
+      <div className="pa-program">L1 Cache Misses: {props.performance.l1CacheMiss}</div>
+      <div className="pa-program">L1 Cache Hits: {props.performance.l1CacheHits}</div>
+      <div className="pa-program">L2 Cache Misses: {props.performance.l2CacheMiss}</div>
+      <div className="pa-program">L2 Cache Hits: {props.performance.l2CacheHits}</div>
+      <div className="pa-program">L1 Cache Miss Rate: {l1MissRate}{pert}</div>
+      <div className="pa-program">L2 Cache Miss Rate: {l2MissRate}{pert}</div>
     </div>)
   }
   
