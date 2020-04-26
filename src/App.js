@@ -50,9 +50,10 @@ class App extends Component {
 			cacheSize: 128,
 			blockSize: 32,
 			associativity: 2,
-			latency: 4
+			latency: 3
 		},
 		showCacheConfig: false,
+		mainMemoryLatency: 4
 	}
 
 	// --- logic to upload and clear file ---
@@ -412,18 +413,66 @@ class App extends Component {
 								}
 							}
 							currentOperations[x] = execute(currentOperations[x], cacheControl, current_cycle)
+							if(currentOperations[x].operator === "lw"){
+								switch (currentOperations[x].foundAt) {
+									case "l1":
+										currentOperations[x].memoryLatency = this.state.l1CacheConfig.latency
+										break;
+									case "l2":
+										currentOperations[x].memoryLatency = this.state.l2CacheConfig.latency
+										break
+									case "mm":
+										currentOperations[x].memoryLatency = this.state.mainMemoryLatency
+										break
+									default:
+										break;
+								}
+								currentOperations[x].memoryCounter = 0
+							}
 							currentOperations[x].execute_counter++;
 						}
 						break;
 
 					case "EX":
-						currentOperations[x].pipeline_stage = "MEM";
-						memory(currentOperations[x], cacheControl, current_cycle)
+						for(let i=(x-1); i>=0; i--){
+							// *** Structural Hazard ***
+							if (currentOperations[i].operator === "lw" && currentOperations[i].memoryCounter <= currentOperations[i].memoryLatency) {
+								// alert("S1")
+								stall = 1;
+								break;
+							}
+						}
+						// If no stalls have been detected.
+						if(currentOperations[x].operator === "lw"){
+							currentOperations[x].pipeline_stage = "MEM";
+							currentOperations[x].memoryCounter++
+						}
+						else if (stall !== 1) {
+							// Move the instruction into the EX stage.
+							currentOperations[x].pipeline_stage = "MEM";
+							memory(currentOperations[x], cacheControl, current_cycle)
+						}
+
 						break;
 
 					case "MEM":
-						currentOperations[x].pipeline_stage = "WB";
-						currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
+						if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
+							currentOperations[x].memoryCounter++;
+						}
+
+						if (currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter < currentOperations[x].memoryLatency){
+							currentOperations[x].pipeline_stage = "MEM";
+							currentOperations[x].memoryCounter++;	
+						}
+						else{
+							currentOperations[x].pipeline_stage = "WB";
+							currentOperations[x] = writeBack(currentOperations[x], cacheControl, current_cycle)
+						}
+
+						if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
+							currentOperations[x].pipeline_stage = "MEM";
+							memory(currentOperations[x], cacheControl, current_cycle)
+						}
 						break;
 
 					case "WB":

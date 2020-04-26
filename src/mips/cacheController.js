@@ -134,14 +134,14 @@ class cacheController{
     }
 
     readFromCache(addr, currentCycle){
-        console.log("Given Dec Addr: ", addr)
+        // console.log("Given Dec Addr: ", addr)
         addr = addr + 268500992
         addr = addr.toString(2) // 268500992 -> the start addr
         
         for(let i=addr.length; i<32; i++){
             addr = "0" + addr
         }
-        console.log("In ReadFromCache : ", addr, currentCycle)
+        // console.log("In ReadFromCache : ", addr, currentCycle)
 
         // console.log("Addr: " + addr)
 
@@ -151,7 +151,7 @@ class cacheController{
         var tag1 = addr.slice(0, this.tagBitsL1)
        
         var data = this.searchInCacheL1(tag1, index1, offset1)
-
+        var foundAt = "l1"
         // console.log("L1Data: ")
         // console.log(data)
         
@@ -163,7 +163,7 @@ class cacheController{
             let tag = addr.slice(0, this.tagBitsL2)
             
             data = this.searchInCacheL2(tag, index, offset, Math.pow(2, this.offsetBitsL1))
-
+            foundAt = "l2"
             // console.log("L2Data: ")
             // console.log(data)
 
@@ -177,7 +177,6 @@ class cacheController{
         if(data === null){
             // console.log("Searching Main Memory")
             let nbBlocks = Math.pow(2, this.offsetBitsL1)
-            data = []
             addr = (parseInt(addr, 2) - 268500992)
             addr = addr - addr % Math.pow(2, this.offsetBitsL1)
             data = []
@@ -185,6 +184,7 @@ class cacheController{
                 // console.log(" Getting Data at: " + (addr + i))
                 data.push(processor.memory[addr + i])
             }
+            foundAt = "mm"
             // console.log("MM Data: ")
             // console.log(data)
             this.writeToCacheL1(tag1, index1, data, currentCycle)
@@ -194,12 +194,12 @@ class cacheController{
 
         // console.log("Final Data: ")
         // console.log(parseInt(data, 2))
-        console.log("Fetched Value = ", parseInt(data, 2))
-        return parseInt(data, 2)
+        // console.log("Fetched Value = ", parseInt(data, 2))
+        return [parseInt(data, 2), foundAt]
     }
 
     writeThrough(addr, data, currentCycle){
-        console.log("Given DecAddr: ", addr)
+        // console.log("Given DecAddr: ", addr)
         // check for the presence of data addr in cacheL1 and update
         addr = addr + 268500992
         addr = addr.toString(2) // 268500992 -> the start addr
@@ -208,8 +208,8 @@ class cacheController{
             addr = "0" + addr
         }
 
-        console.log("In WriteThrough ", addr, currentCycle)
-        console.log("Writing Val = ", data)
+        // console.log("In WriteThrough ", addr, currentCycle)
+        // console.log("Writing Val = ", data)
 
         var offset = addr.slice(32-this.offsetBitsL1)
         var index = addr.slice(32-(this.offsetBitsL1 + this.indexBitsL1), 32-this.offsetBitsL1)
@@ -217,8 +217,8 @@ class cacheController{
 
         var dataFetched = this.searchInCacheL1(tag, index, offset)
         if(dataFetched !== null){
-            console.log("FetchedData: ")
-            console.log(dataFetched)
+            // console.log("FetchedData: ")
+            // console.log(dataFetched)
             // dataFetched[parseInt(offset, 2)] = data
             this.writeToCacheL1(tag, index, data, currentCycle, offset)
         }
