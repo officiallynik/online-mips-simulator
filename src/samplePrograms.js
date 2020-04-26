@@ -1,6 +1,6 @@
 const bubbleSort = `.data
 array: 
-	.word 6, 10, 8, 1, 4, 2, 9, 3, 5, 7
+	.word 4, 2, 1, 5, 3         // inputs
 
 .text
 end:
@@ -65,7 +65,7 @@ loop1:
 main:
 	lui $s0, 0x1001
 	li $t0, 0
-	li $t1, 10
+	li $t1, 5                   // number of inputs
     j loop1`
     
 const sumOfNum = `.data

@@ -24,6 +24,7 @@ var current_cycle = 1
 var stalls = 0
 var stalled = 0
 var cacheControl = null
+var numCompInstr = 0
 
 class App extends Component {
 
@@ -90,7 +91,7 @@ class App extends Component {
 	assemble = () => {
 		processor.reset()
 		parser.reset()
-
+		numCompInstr = 0
 		this.CacheConfigure()
 		// const cache = new cacheController(this.state.l1CacheConfig, this.state.l2CacheConfig)
 
@@ -262,7 +263,7 @@ class App extends Component {
 
 					case "IF":
 						// Set the new stage to ID
-						for (let i = (x - 1); i >= 0; i--) {
+						for (let i = (x - 1); i >= numCompInstr; i--) {
 							// console.log("I: " + i)
 
 							if (currentOperations[i].dest !== undefined && currentOperations[x].src1 !== undefined) {
@@ -327,7 +328,7 @@ class App extends Component {
 					case "ID/RF":
 						// console.log("X: " + x)
 						// Check if this instruction can be executed by comparing it against all previous instructions.
-						for (let i = (x - 1); i >= 0; i--) {
+						for (let i = (x - 1); i >= numCompInstr; i--) {
 							// console.log("I: " + i)
 							if (currentOperations[i].pipeline_stage === "EX" && currentOperations[i].operator === currentOperations[x].operator) {
 								// *** Structural Hazard ***
@@ -434,7 +435,7 @@ class App extends Component {
 						break;
 
 					case "EX":
-						for(let i=(x-1); i>=0; i--){
+						for(let i=(x-1); i>=numCompInstr; i--){
 							// *** Structural Hazard ***
 							if (currentOperations[i].operator === "lw" && currentOperations[i].memoryCounter <= currentOperations[i].memoryLatency) {
 								// alert("S1")
@@ -477,6 +478,7 @@ class App extends Component {
 
 					case "WB":
 						// Complete the execution of this instruction.
+						numCompInstr++
 						currentOperations[x].pipeline_stage = " ";
 						break;
 
@@ -502,6 +504,7 @@ class App extends Component {
 				}
 				// Display the value on the screen.
 			}
+			// console.log(numCompInstr)
 			x++;
 		}
 

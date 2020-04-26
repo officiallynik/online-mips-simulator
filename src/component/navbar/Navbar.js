@@ -59,7 +59,9 @@ class Navbar extends React.Component{
                         </span>
                     </div>
 
-                    <div className="nav-item nav-buttons" onClick={() => alert("Help section will be available soon")}> 
+                    <div className="nav-item nav-buttons" onClick={() => alert(
+                        `Using The Simulator\n1. Upload or Write Your Code\n2. Enable/Disable DataForwarding Option (Disabled By Default)\n3. Enable/Disable MoreStats To View Pipeline (Disabled By Default)\n4. Configure The Cache\n5. StepRun/Run Your MIPS Code\n\nCheck Performance Of Program and Simulator in SideBar\n** Execution may take few seconds depending on Configuration of Simulator` 
+                    )}> 
                         <span>
                             Help
                         </span>
