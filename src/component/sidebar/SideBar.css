@@ -101,6 +101,9 @@
 }
 
 .display-value{
-    padding-right: 30px;
     float: right;
+}
+
+.input-cache-info{
+    position: relative;
 }

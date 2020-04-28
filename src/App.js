@@ -51,10 +51,10 @@ class App extends Component {
 			cacheSize: 128,
 			blockSize: 32,
 			associativity: 2,
-			latency: 3
+			latency: 4
 		},
 		showCacheConfig: false,
-		mainMemoryLatency: 4
+		mainMemoryLatency: 6
 	}
 
 	// --- logic to upload and clear file ---
@@ -715,6 +715,12 @@ class App extends Component {
 		})
 	}
 
+	onMainMemoryConfig = latency => {
+		this.setState({
+			mainMemoryLatency: latency
+		})
+	}
+
 	render = () => {
 		return (
 			<div className="main-screen">
@@ -751,6 +757,8 @@ class App extends Component {
 							l2CacheInfo={this.state.l2CacheConfig}
 							isShowing={this.state.showCacheConfig}
 							hideCacheSettings={this.onToggleCacheSettings}
+							mainMemoryConfig={this.onMainMemoryConfig}
+							mainMemory={this.state.mainMemoryLatency}
 						/>
 					</div>
 					<div style={{ width: '80%' }}>

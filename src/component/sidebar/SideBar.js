@@ -88,29 +88,6 @@ const SideBar = props => {
   const {hideCacheSettings} = props
 
   useEffect(() => hideCacheSettings(isCacheConfShow), [isCacheConfShow, hideCacheSettings])
-
-  var AssociativityL1 = ""
-  if(props.l1CacheInfo.associativity === 0){
-    AssociativityL1 = (<span>(Fully Associative)</span>)
-  }
-  else if(props.l1CacheInfo.associativity === props.l1CacheInfo.cacheSize/props.l1CacheInfo.blockSize){
-    AssociativityL1 = (<span>(Direct Mapped)</span>)
-  }
-  else{
-    AssociativityL1 = ""
-  }
-
-  var AssociativityL2 = ""
-  if(props.l2CacheInfo.associativity === 0){
-    AssociativityL2 = (<span>(Fully Associative)</span>)
-  }
-  else if(props.l2CacheInfo.associativity === props.l2CacheInfo.cacheSize/props.l2CacheInfo.blockSize){
-    AssociativityL2 = (<span>(Direct Mapped)</span>)
-  }
-  else{
-    AssociativityL2 = ""
-  }
-
   
   var cacheSettingsDisplay = ""
   
@@ -118,16 +95,38 @@ const SideBar = props => {
     cacheSettingsDisplay = (
       <div className="cache-settings">
         <div className="cache-options">
-          <div>Cache Size : <span className="display-value"> Bytes</span></div>
+          Cache Size: 
+          <select className="display-value" onChange={(x) => props.configureCache(1, parseInt(x.target.value), props.l1CacheInfo.blockSize, props.l1CacheInfo.associativity, props.l1CacheInfo.latency)}>
+            <option value={8} selected={props.l1CacheInfo.cacheSize === 8}>8 Bytes</option>
+            <option value={16} selected={props.l1CacheInfo.cacheSize === 16}>16 Bytes</option>
+            <option value={32} selected={props.l1CacheInfo.cacheSize === 32}>32 Bytes</option>
+            <option value={64} selected={props.l1CacheInfo.cacheSize === 64}>64 Bytes</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Block Size: <span className="display-value">{props.l1CacheInfo.blockSize} Bytes</span></div>
+          Block Size:
+          <select className="display-value" onChange={(x) => props.configureCache(1, props.l1CacheInfo.cacheSize, parseInt(x.target.value), props.l1CacheInfo.associativity, props.l1CacheInfo.latency)}>
+            <option value={4} selected={props.l1CacheInfo.blockSize === 4}>4 Bytes</option>
+            <option value={8} selected={props.l1CacheInfo.blockSize === 8}>8 Bytes</option>
+            <option value={16} selected={props.l1CacheInfo.blockSize === 16}>16 Bytes</option>
+            <option value={32} selected={props.l1CacheInfo.blockSize === 32}>32 Bytes</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Associativity: {AssociativityL1} <span className="display-value">{props.l1CacheInfo.associativity} Way(s)</span></div>
+          Associativity:
+          <select className="display-value" onChange={(x) => props.configureCache(1, props.l1CacheInfo.cacheSize, props.l1CacheInfo.blockSize, parseInt(x.target.value), props.l1CacheInfo.latency)}>
+            <option value={props.l1CacheInfo.cacheSize/props.l1CacheInfo.blockSize} selected={props.l1CacheInfo.associativity === props.l1CacheInfo.cacheSize/props.l1CacheInfo.blockSize}>Direct Mapped</option>
+            <option value={2} selected={props.l1CacheInfo.associativity === 2}>2 Way</option>
+            <option value={4} selected={props.l1CacheInfo.associativity === 4}>4 Way</option>
+            <option value={1} selected={props.l1CacheInfo.associativity === 1}>Fully Associative</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Latency: <span className="display-value">{props.l1CacheInfo.latency} Cycles</span></div>
+          Latency:
+          <select className="display-value" onChange={(x) => props.configureCache(1, props.l1CacheInfo.cacheSize, props.l1CacheInfo.blockSize, props.l1CacheInfo.associativity, parseInt(x.target.value))}>
+            <option value={2} selected={props.l1CacheInfo.latency === 2}>2 Cycles</option>
+            <option value={3} selected={props.l1CacheInfo.latency === 3}>3 Cycles</option>
+          </select>
         </div>
       </div>
     )
@@ -136,16 +135,39 @@ const SideBar = props => {
     cacheSettingsDisplay = (
       <div className="cache-settings">
         <div className="cache-options">
-          <div>Cache Size : <span>{props.l2CacheInfo.cacheSize} Bytes</span></div>
+          Cache Size: 
+          <select className="display-value" onChange={(x) => props.configureCache(2, parseInt(x.target.value), props.l2CacheInfo.blockSize, props.l2CacheInfo.associativity, props.l2CacheInfo.latency)}>
+            <option value={64} selected={props.l2CacheInfo.cacheSize === 64}>64 Bytes</option>
+            <option value={128} selected={props.l2CacheInfo.cacheSize === 128}>128 Bytes</option>
+            <option value={256} selected={props.l2CacheInfo.cacheSize === 256}>256 Bytes</option>
+            <option value={512} selected={props.l2CacheInfo.cacheSize === 512}>512 Bytes</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Block Size: {props.l2CacheInfo.blockSize} Bytes</div>
+          Block Size:
+          <select className="display-value" onChange={(x) => props.configureCache(2, props.l2CacheInfo.cacheSize, parseInt(x.target.value), props.l2CacheInfo.associativity, props.l2CacheInfo.latency)}>
+            <option value={16} selected={props.l2CacheInfo.blockSize === 16}>16 Bytes</option>
+            <option value={32} selected={props.l2CacheInfo.blockSize === 32}>32 Bytes</option>
+            <option value={64} selected={props.l2CacheInfo.blockSize === 64}>64 Bytes</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Associativity: {props.l2CacheInfo.associativity} {AssociativityL2}</div>
+          Associativity:
+          <select className="display-value" onChange={(x) => props.configureCache(2, props.l2CacheInfo.cacheSize, props.l2CacheInfo.blockSize, parseInt(x.target.value), props.l2CacheInfo.latency)}>
+            <option value={props.l2CacheInfo.cacheSize/props.l2CacheInfo.blockSize} selected={props.l2CacheInfo.associativity === props.l2CacheInfo.cacheSize/props.l2CacheInfo.blockSize}>Direct Mapped</option>
+            <option value={2} selected={props.l2CacheInfo.associativity === 2}>2 Way</option>
+            <option value={4} selected={props.l2CacheInfo.associativity === 4}>4 Way</option>
+            <option value={8} selected={props.l2CacheInfo.associativity === 8}>8 Way</option>
+            <option value={1} selected={props.l2CacheInfo.associativity === 1}>Fully Associative</option>
+          </select>
         </div>
         <div className="cache-options">
-          <div>Latency: {props.l2CacheInfo.latency} Cycles</div>
+          Latency:
+          <select className="display-value" onChange={(x) => props.configureCache(2, props.l2CacheInfo.cacheSize, props.l2CacheInfo.blockSize, props.l2CacheInfo.associativity, parseInt(x.target.value))}>
+            <option value={3} selected={props.l2CacheInfo.latency === 3}>3 Cycles</option>
+            <option value={4} selected={props.l2CacheInfo.latency === 4}>4 Cycles</option>
+            <option value={5} selected={props.l2CacheInfo.latency === 5}>5 Cycles</option>
+          </select>
         </div>
       </div>
     )
@@ -257,6 +279,14 @@ const SideBar = props => {
           </div>
           <div>
             {cacheSettingsDisplay}
+            <div className="cache-options">
+              Main Memory Latency:
+              <select className="display-value" onChange={(x) => props.mainMemoryConfig(parseInt(x.target.value))}>
+                <option value={6} selected={props.mainMemory === 6}>6 Cycles</option>
+                <option value={8} selected={props.mainMemory === 8}>>8 Cycles</option>
+                <option value={10} selected={props.mainMemory === 10}>>10 Cycles</option>
+              </select>
+            </div>
           </div>
       </div>
     </div>
