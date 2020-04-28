@@ -495,6 +495,7 @@ class App extends Component {
 							// Move the instruction into the EX stage.
 							else if(currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter === currentOperations[x].memoryLatency){
 								currentOperations[x].memoryCounter++;
+								currentOperations[x].pipeline_stage = "WB"
 							}
 							else if (currentOperations[x].operator === 'lw' && currentOperations[x].memoryCounter < currentOperations[x].memoryLatency){
 								currentOperations[x].pipeline_stage = "MEM";
