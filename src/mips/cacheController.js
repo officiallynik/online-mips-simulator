@@ -41,16 +41,22 @@ class cacheController{
     }
 
     searchInCacheL2(tag, index, offset, nbBlocks){
-        let setStartBlk = parseInt(index, 2)*(this.nbLinesL1/Math.pow(2, index.toString().length))
-        // console.log("NBBlocks: " + this.nbLinesL1/Math.pow(2, index.toString(2).length))
-        for(let i=0; i<this.nbLinesL1/Math.pow(2, index.toString(2).length); i++){
-            var fetchedTag = this.tagL1[setStartBlk + i]
-            // console.log(set*this.nbLinesL1/Math.pow(2, index.toString(2).length)*Math.pow(2, offset.length) + i + parseInt(offset, 2))
+        // console.log(this.dataL2)
+        // console.log(this.tagL2)
+        // console.log(tag, index, offset)
+        // console.log(nbBlocks)
+
+        let setStartBlk = parseInt(index, 2)*(this.nbLinesL2/Math.pow(2, index.toString().length))
+        // console.log("In L1")
+        // console.log(tag, index, offset, set)
+        for(let i=0; i<parseInt(this.nbLinesL2/Math.pow(2, index.toString(2).length)); i++){
+            var fetchedTag = this.tagL2[setStartBlk + i]
+            // console.log((set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2))
             if(tag === fetchedTag){
-                var startBlk = parseInt(offset, 2) - (parseInt(offset, 2) % nbBlocks)
-                var data = []
+                // console.log("String Found at idx " + (((set + i)*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2)))
+                let data = []
                 for(let j=0; j<nbBlocks; j++){
-                    data.push(this.dataL1[(setStartBlk + i)*Math.pow(2, this.offsetBitsL2) + startBlk + j])
+                    data.push(this.dataL2[((setStartBlk + i)*Math.pow(2, this.offsetBitsL2)) + parseInt(offset, 2) + j])
                 }
                 return data
             }
@@ -157,24 +163,20 @@ class cacheController{
        
         var data = this.searchInCacheL1(tag1, index1, offset1)
         var foundAt = "l1"
-        this.hitsL1++
         // console.log("L1Data: ")
         // console.log(data)
         
         // the search in CacheL1
         if(data === null){
-            // console.log("Searching CacheL2")
+            console.log("Searching CacheL2")
             let offset = addr.slice(32-this.offsetBitsL2)
             let index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
             let tag = addr.slice(0, this.tagBitsL2)
             
             data = this.searchInCacheL2(tag, index, offset, Math.pow(2, this.offsetBitsL1))
             foundAt = "l2"
-            this.missL1++
-            this.hitsL1--
-            this.hitsL2++
-            // console.log("L2Data: ")
-            // console.log(data)
+            console.log("L2Data: ")
+            console.log(data)
 
             if(data !== null){
                 this.writeToCacheL1(tag1, index1, data, currentCycle)
@@ -194,8 +196,6 @@ class cacheController{
                 data.push(processor.memory[addr + i])
             }
             foundAt = "mm"
-            this.hitsL2--
-            this.missL2++
             // console.log("MM Data: ")
             // console.log(data)
             this.writeToCacheL1(tag1, index1, data, currentCycle)

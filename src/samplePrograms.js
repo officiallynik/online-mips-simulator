@@ -99,8 +99,48 @@ main:
     addi $t4, $t3, 10
 `
 
+const checkOutCache = `.data
+array:
+    .word 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+.text
+end:
+    jr $ra
+
+sumarray2:
+    beq $t0, $t1, end
+    lw $t2, 0($s1)
+    add $s0, $t2, $s0
+    addi $t0, $t0, 1
+    addi $s1, $s1, 4
+    j sumarray2    
+
+sumagain:
+    li $t0, 0
+    li $t1, 10
+    lui $s1, 0x1001
+    j sumarray2  
+
+sumarray:
+    beq $t0, $t1, sumagain
+    lw $t2, 0($s1)
+    add $s0, $t2, $s0
+    addi $t0, $t0, 1
+    addi $s1, $s1, 4
+    j sumarray
+
+.globl main
+main:
+    li $s0, 0
+    li $t0, 0
+    li $t1, 10
+    lui $s1, 0x1001
+    j sumarray
+`
+
 export {
     sumOfNum,
     bubbleSort,
-    tryOutPipeline
+    tryOutPipeline,
+    checkOutCache
 }

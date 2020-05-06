@@ -6,7 +6,7 @@ import Navbar from './component/navbar/Navbar';
 import Console from './component/console/Console'
 import SideBar from './component/sidebar/SideBar'
 
-import { bubbleSort, sumOfNum, tryOutPipeline } from './samplePrograms'
+import { bubbleSort, sumOfNum, tryOutPipeline, checkOutCache } from './samplePrograms'
 
 // importing from mips
 import processor from './mips/processor'
@@ -642,9 +642,14 @@ class App extends Component {
 				code: sumOfNum
 			})
 		}
-		else {
+		else if(program === 'tryOutPipeline'){
 			this.setState({
 				code: tryOutPipeline
+			})
+		}
+		else{
+			this.setState({
+				code: checkOutCache
 			})
 		}
 	}
@@ -759,6 +764,7 @@ class App extends Component {
 							hideCacheSettings={this.onToggleCacheSettings}
 							mainMemoryConfig={this.onMainMemoryConfig}
 							mainMemory={this.state.mainMemoryLatency}
+							morestats={this.state.enableMoreStats}
 						/>
 					</div>
 					<div style={{ width: '80%' }}>

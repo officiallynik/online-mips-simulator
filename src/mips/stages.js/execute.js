@@ -96,6 +96,19 @@ const execution = (instr, cacheController, currentCycle) => {
                 const result = cacheController.readFromCache(addr, currentCycle)
                 instr.result = result[0]
                 instr.foundAt = result[1]
+
+                if(instr.foundAt === 'mm'){
+                    cacheController.missL1++
+                    cacheController.missL2++
+                }
+                else if(instr.foundAt === 'l2'){
+                    cacheController.missL1++
+                    cacheController.hitsL2++
+                }
+                else{
+                    cacheController.hitsL1++
+                }
+
                 break
             case 'li':
                 instr.result = instr.val

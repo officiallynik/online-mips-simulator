@@ -107,3 +107,17 @@
 .input-cache-info{
     position: relative;
 }
+
+#cache-tableL1{
+    width: 100%;
+    border-collapse: separate;
+}
+
+#cache-tableL2{
+    width: 100%;
+    border-collapse: separate;
+}
+
+.cache-row{
+    height: 30px;
+}
