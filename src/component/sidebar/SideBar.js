@@ -313,20 +313,18 @@ const SideBar = props => {
         >
           {isOpen.cacheTable ? <i className="fas fa-folder-open"></i> : <i className="fas fa-folder"></i>}
           CACHE TABLE
-          <span style={{ float: 'right' }} onClick={e => handleRefreshClick(e)}><i class="fas fa-redo-alt"></i></span>
+          <span style={isOpen.cacheTable?{ float: 'right' }:{display:'none'}} onClick={e => handleRefreshClick(e)}><i class="fas fa-redo-alt"></i></span>
         </div>
         <div style={isOpen.cacheTable ? { display: 'block', color: 'white' } : { display: 'none' }}>
           <div className="cache-headers">
             <span className="cache-labels" style={cacheToDisplay === 1 ? { backgroundColor: '#696b6a' } : {}}
               onClick={() => {
                 setCacheToDisplay(1)
-                props.refreshCacheContents(1)
               }}
             >L1 Cache</span>
             <span className="cache-labels" style={cacheToDisplay === 2 ? { backgroundColor: '#696b6a' } : {}}
               onClick={() => {
                 setCacheToDisplay(2)
-                props.refreshCacheContents(2)
               }}
             >L2 Cache</span>
           </div>

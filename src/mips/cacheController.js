@@ -47,7 +47,11 @@ class cacheController{
         // console.log(nbBlocks)
 
         let setStartBlk = parseInt(index, 2)*(this.nbLinesL2/Math.pow(2, index.toString().length))
-        // console.log("In L1")
+        // console.log("StrtBlk")
+        // console.log(setStartBlk)
+        // console.log("NbBlocks")
+        // console.log(this.nbLinesL2/Math.pow(2, index.toString(2).length))
+        // // console.log("In L1")
         // console.log(tag, index, offset, set)
         for(let i=0; i<parseInt(this.nbLinesL2/Math.pow(2, index.toString(2).length)); i++){
             var fetchedTag = this.tagL2[setStartBlk + i]
@@ -56,7 +60,13 @@ class cacheController{
                 // console.log("String Found at idx " + (((set + i)*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2)))
                 let data = []
                 for(let j=0; j<nbBlocks; j++){
-                    data.push(this.dataL2[((setStartBlk + i)*Math.pow(2, this.offsetBitsL2)) + parseInt(offset, 2) + j])
+                    let temp = this.dataL2[((setStartBlk + i)*Math.pow(2, this.offsetBitsL2)) + parseInt(offset, 2) + j]
+                    if(temp) {
+                        data.push(temp)
+                    }
+                    else{
+                        return null
+                    }
                 }
                 return data
             }
@@ -95,9 +105,17 @@ class cacheController{
         // console.log("lruBlk: " + lruBlk)
         let blk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (lruBlk*Math.pow(2, this.offsetBitsL1))
         let evictedData = this.dataL1.splice(blk, data.length, ...data)
+        // console.log("Evicted Data: ")
+        // console.log(evictedData)
+        // console.log(evictedData.some(value => typeof(parseInt(value, 2))==="number"))
         let tagBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))) + lruBlk
-        if(!evictedData.includes(undefined)){
-            this.writeToCacheL2(this.tagL1[tagBlk].toString(2) + index.toString(2) + (blk % Math.pow(2, this.offsetBitsL1)).toString(2), evictedData, cycle)
+        if(evictedData.some(value => typeof(parseInt(value, 2))==="number")){
+            let data = []
+            evictedData.forEach(item => {
+                if(item) data.push(item)
+            })
+            // console.log(data)
+            this.writeToCacheL2(this.tagL1[tagBlk].toString(2) + index.toString(2) + (blk % Math.pow(2, this.offsetBitsL1)).toString(2), data, cycle)
         }
         this.tagL1[tagBlk] = tag
         this.cntL1[tagBlk] = cycle
@@ -112,9 +130,11 @@ class cacheController{
         let tag = addr.slice(0, this.tagBitsL2)
 
         // console.log(tag, index, offset)
+        // console.log(data)
 
         let set = parseInt(index, 2)
         let startBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length)))
+        // console.log("StartBlk: ", startBlk)
         
         // if empty space or same tag is present
         for(let i=startBlk; i<startBlk+this.nbLinesL2/Math.pow(2, index.toString(2).length); i++){
@@ -208,6 +228,7 @@ class cacheController{
     }
 
     writeThrough(addr, data, currentCycle){
+        // console.log("Writing Through")
         // console.log("Given DecAddr: ", addr)
         // check for the presence of data addr in cacheL1 and update
         addr = addr + 268500992
@@ -238,8 +259,10 @@ class cacheController{
         tag = addr.slice(0, this.tagBitsL2)
 
         dataFetched = this.searchInCacheL2(tag, index, offset, 1)
+        // console.log(tag, index, offset)
+        // console.log("Writing Through L2 ", dataFetched)
         if(dataFetched !== null){
-            this.writeToCacheL2(offset.toString()+index.toString()+tag.toString(), data, currentCycle)
+            this.writeToCacheL2(tag.toString()+index.toString()+offset.toString(), [data], currentCycle)
         }
 
         // update the contents of main memory
