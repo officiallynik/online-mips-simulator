@@ -176,48 +176,55 @@ const SideBar = props => {
     )
   }
 
+  const handleRefreshClick = e => {
+    if (e) e.stopPropagation()
+    if (isOpen.cacheTable) {
+      props.refreshCacheContents(cacheToDisplay)
+    }
+  }
+
   useEffect(() => {
-    if(isOpen.cacheTable && props.morestats){
-      if(cacheToDisplay === 1){
+    if (isOpen.cacheTable) {
+      if (cacheToDisplay === 1) {
         let cnt = 0
         var table = document.getElementById("cache-tableL1")
         table.innerHTML = ""
-        for (let i = 0; i < props.l1CacheInfo.cacheSize/props.l1CacheInfo.blockSize; i++) {
+        for (let i = 0; i < props.l1CacheInfo.cacheSize / props.l1CacheInfo.blockSize; i++) {
           var cacheRow = table.insertRow(i)
           cacheRow.className = "cache-row"
-          for (let j = 0; j < props.l1CacheInfo.blockSize/4; j++) {
+          for (let j = 0; j < props.l1CacheInfo.blockSize / 4; j++) {
             var cacheBlock = cacheRow.insertCell(j)
             cacheBlock.setAttribute("nowrap", "nowrap")
-            cacheBlock.className = "cache-block"
-            cacheBlock.className = `cache-blockL1${cnt}`
+            cacheBlock.className = `cache-block cache-blockL1${cnt}`
             cnt++
           }
         }
+        handleRefreshClick()
       }
-      else{
+      else {
         let cnt = 0
         table = document.getElementById("cache-tableL2")
         table.innerHTML = ""
-        for (let i = 0; i < props.l2CacheInfo.cacheSize/props.l2CacheInfo.blockSize; i++) {
+        for (let i = 0; i < props.l2CacheInfo.cacheSize / props.l2CacheInfo.blockSize; i++) {
           cacheRow = table.insertRow(i)
           cacheRow.className = "cache-row"
-          for (let j = 0; j < props.l2CacheInfo.blockSize/4; j++) {
+          for (let j = 0; j < props.l2CacheInfo.blockSize / 4; j++) {
             cacheBlock = cacheRow.insertCell(j)
             cacheBlock.setAttribute("nowrap", "nowrap")
-            cacheBlock.className = "cache-block"
-            cacheBlock.className = `cache-blockL2${cnt}`
+            cacheBlock.className = `cache-block cache-blockL2${cnt}`
             cnt++
           }
         }
+        handleRefreshClick()
       }
     }
-    else{
+    else {
       table = document.getElementById("cache-tableL1")
       table.innerHTML = ""
       table = document.getElementById("cache-tableL2")
       table.innerHTML = ""
     }
-  }, [props.morestats, isOpen, cacheToDisplay, props.l2CacheInfo.cacheSize, props.l2CacheInfo.blockSize, props.l1CacheInfo.cacheSize, props.l1CacheInfo.blockSize])
+  }, [isOpen, cacheToDisplay, props.l2CacheInfo.cacheSize, props.l2CacheInfo.blockSize, props.l1CacheInfo.cacheSize, props.l1CacheInfo.blockSize])
 
   return (
     <div className="sidebar">
@@ -306,33 +313,29 @@ const SideBar = props => {
         >
           {isOpen.cacheTable ? <i className="fas fa-folder-open"></i> : <i className="fas fa-folder"></i>}
           CACHE TABLE
+          <span style={{ float: 'right' }} onClick={e => handleRefreshClick(e)}><i class="fas fa-redo-alt"></i></span>
         </div>
         <div style={isOpen.cacheTable ? { display: 'block', color: 'white' } : { display: 'none' }}>
-
-          <div style={!props.morestats ? { display: 'none' } : {}}>
-            <div className="cache-headers">
-              <span className="cache-labels" style={cacheToDisplay === 1 ? { backgroundColor: '#696b6a' } : {}}
-                onClick={() => setCacheToDisplay(1)}
-              >L1 Cache</span>
-              <span className="cache-labels" style={cacheToDisplay === 2 ? { backgroundColor: '#696b6a' } : {}}
-                onClick={() => setCacheToDisplay(2)}
-              >L2 Cache</span>
-            </div>
-
-            <table border='2' id='cache-tableL1' style={cacheToDisplay !== 1? {display: 'none'}: {}}>
-            </table>
-
-            <table border='2' id='cache-tableL2' style={cacheToDisplay !== 2? {display: 'none'}: {}} >
-            </table>
+          <div className="cache-headers">
+            <span className="cache-labels" style={cacheToDisplay === 1 ? { backgroundColor: '#696b6a' } : {}}
+              onClick={() => {
+                setCacheToDisplay(1)
+                props.refreshCacheContents(1)
+              }}
+            >L1 Cache</span>
+            <span className="cache-labels" style={cacheToDisplay === 2 ? { backgroundColor: '#696b6a' } : {}}
+              onClick={() => {
+                setCacheToDisplay(2)
+                props.refreshCacheContents(2)
+              }}
+            >L2 Cache</span>
           </div>
 
-          <div style={isOpen.cacheTable && props.morestats ? { display: 'none' } : {}}>
-            <div style={{marginLeft: "30px"}}>Enable More Stats to view cache contents and Pipeline</div>
-            <div style={{color:'orange', marginLeft: "30px"}}>
-              Warning: Time Taken To Complete The Task May Increase By Large Amount Or System May Hang!!
-            </div>
-          </div>
+          <table border='2' id='cache-tableL1' style={cacheToDisplay !== 1 ? { display: 'none' } : {}}>
+          </table>
 
+          <table border='2' id='cache-tableL2' style={cacheToDisplay !== 2 ? { display: 'none' } : {}} >
+          </table>
         </div>
       </div>
 

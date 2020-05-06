@@ -110,14 +110,19 @@
 
 #cache-tableL1{
     width: 100%;
-    border-collapse: separate;
+    /* border-collapse: separate; */
 }
 
 #cache-tableL2{
     width: 100%;
-    border-collapse: separate;
+    /* border-collapse: separate; */
 }
 
 .cache-row{
     height: 30px;
+}
+
+.cache-block{
+    text-align: center;
+    width: 30px;
 }

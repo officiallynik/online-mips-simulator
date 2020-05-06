@@ -168,15 +168,13 @@ class cacheController{
         
         // the search in CacheL1
         if(data === null){
-            console.log("Searching CacheL2")
+            // console.log("Searching CacheL2")
             let offset = addr.slice(32-this.offsetBitsL2)
             let index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
             let tag = addr.slice(0, this.tagBitsL2)
             
             data = this.searchInCacheL2(tag, index, offset, Math.pow(2, this.offsetBitsL1))
             foundAt = "l2"
-            console.log("L2Data: ")
-            console.log(data)
 
             if(data !== null){
                 this.writeToCacheL1(tag1, index1, data, currentCycle)

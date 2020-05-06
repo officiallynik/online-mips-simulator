@@ -624,6 +624,26 @@ class App extends Component {
 		}
 	}
 
+	showCacheContents = cacheLevel => {
+		let data = null
+		if(cacheControl){
+			if(cacheLevel === 1){
+				data = cacheControl.dataL1
+				data.forEach((item, idx) => {
+					let blk = document.getElementsByClassName(`cache-blockL1${idx}`)[0]
+					if(blk) blk.innerHTML = isNaN(item)? "" : parseInt(item, 2)
+				})
+			} 
+			if(cacheLevel === 2){
+				data = cacheControl.dataL2
+				data.forEach((item, idx) => {
+					let blk = document.getElementsByClassName(`cache-blockL2${idx}`)[0]
+					if(blk) blk.innerHTML = isNaN(item)? "" : parseInt(item, 2)
+				})
+			}
+		}
+	}
+
 
 	onSideNavClick = (event) => {
 		this.setState({
@@ -764,7 +784,7 @@ class App extends Component {
 							hideCacheSettings={this.onToggleCacheSettings}
 							mainMemoryConfig={this.onMainMemoryConfig}
 							mainMemory={this.state.mainMemoryLatency}
-							morestats={this.state.enableMoreStats}
+							refreshCacheContents={this.showCacheContents}
 						/>
 					</div>
 					<div style={{ width: '80%' }}>
