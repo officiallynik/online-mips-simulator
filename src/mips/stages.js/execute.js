@@ -94,9 +94,9 @@ const execution = (instr, cacheController, currentCycle) => {
                 // const valDec = parseInt(val, 2)
 
                 // console.log(valDec, addr, val)
-                console.log("ADDR: ", addr)
+                // console.log("ADDR: ", addr)
                 const result = cacheController.readFromCache(addr, currentCycle)
-                console.log(addr, result[0], result[1])
+                // console.log(addr, result[0], result[1])
                 instr.result = result[0]
                 instr.foundAt = result[1]
 

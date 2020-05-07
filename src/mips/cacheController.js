@@ -77,21 +77,21 @@ class cacheController{
 
     writeToCacheL1(tag, index, data, cycle, offset = null){
         // console.log(data)
-        console.log(data)
+        // console.log(data)
         if(typeof(offset) === "string" && offset.length === 0) offset = '0'
-        console.log(tag, index, offset)
+        // console.log(tag, index, offset)
         
         let set = parseInt(index, 2)
         
         let startBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length)))
 
-        console.log("StartBlk: ", startBlk)
+        // console.log("StartBlk: ", startBlk)
         
         // if same tag is present
         for(let i=startBlk; i<startBlk+this.nbLinesL1/Math.pow(2, index.toString(2).length) && offset!==null; i++){
-            console.log(this.tagL1[i])
+            // console.log(this.tagL1[i])
             if(this.tagL1[i] === tag){
-                console.log("writing to cache L1 only")
+                // console.log("writing to cache L1 only")
                 this.dataL1[i*Math.pow(2, this.offsetBitsL1) + parseInt(offset, 2)] = data
                 this.tagL1[i] = tag
                 this.cntL1[i] = cycle
@@ -129,21 +129,21 @@ class cacheController{
     }
 
     writeToCacheL2(addr, data, cycle){
-        console.log("EvictedData: " + addr)
-        console.log(data)
+        // console.log("EvictedData: " + addr)
+        // console.log(data)
         addr = addr.slice(0, 32)
 
         let offset = addr.slice(32-this.offsetBitsL2)
         let index = addr.slice(32-(this.offsetBitsL2 + this.indexBitsL2), 32-this.offsetBitsL2)
         let tag = addr.slice(0, this.tagBitsL2)
 
-        console.log("addr split: ")
-        console.log(tag, index, offset)
+        // console.log("addr split: ")
+        // console.log(tag, index, offset)
         // console.log(data)
 
         let set = parseInt(index, 2)
         let startBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length)))
-        console.log("StartBlk: ", startBlk)
+        // console.log("StartBlk: ", startBlk)
         
         // if empty space or same tag is present
         for(let i=startBlk; i<startBlk+this.nbLinesL2/Math.pow(2, index.toString(2).length); i++){
@@ -174,7 +174,7 @@ class cacheController{
     }
 
     readFromCache(addr, currentCycle){
-        console.log("Given Dec Addr: ", addr) 
+        // console.log("Given Dec Addr: ", addr) 
         addr = addr + 268500992
         addr = addr.toString(2) // 268500992 -> the start addr
         
@@ -192,8 +192,8 @@ class cacheController{
        
         var data = this.searchInCacheL1(tag1, index1, offset1)
         var foundAt = "l1"
-        console.log("L1Data: ")
-        console.log(data)
+        // console.log("L1Data: ")
+        // console.log(data)
         
         // the search in CacheL2
         if(data === null){
@@ -225,7 +225,7 @@ class cacheController{
             foundAt = "mm"
             this.writeToCacheL1(tag1, index1, data, currentCycle)
             data = data[parseInt(offset1, 2) | 0]
-            console.log("MM data: ", data)
+            // console.log("MM data: ", data)
         }
 
         // console.log("Final Data: ")

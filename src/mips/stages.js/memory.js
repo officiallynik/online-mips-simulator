@@ -20,7 +20,7 @@ const memory = (instr, cacheController, currentCycle) => {
 
         // console.log(addr, val, valDec)
         let result = cacheController.readFromCache(addr, currentCycle)
-        console.log(addr, result)
+        // console.log(addr, result)
         instr.result = result[0]
         processor.setRegister(instr.dest, instr.result)
     }
