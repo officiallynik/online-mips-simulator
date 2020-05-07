@@ -81,6 +81,7 @@ const execution = (instr, cacheController, currentCycle) => {
                 instr.result = res? 1 : 0
                 break
             case 'lw':
+                instr.src1.val = processor.getRegister(instr.src1.reg)
                 src1 = instr.src1.val
 
                 if (instr.dep1 !== undefined && instr.dep1 !== "") {
@@ -93,7 +94,9 @@ const execution = (instr, cacheController, currentCycle) => {
                 // const valDec = parseInt(val, 2)
 
                 // console.log(valDec, addr, val)
+                console.log("ADDR: ", addr)
                 const result = cacheController.readFromCache(addr, currentCycle)
+                console.log(addr, result[0], result[1])
                 instr.result = result[0]
                 instr.foundAt = result[1]
 

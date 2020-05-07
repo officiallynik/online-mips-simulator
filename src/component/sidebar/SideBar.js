@@ -100,7 +100,6 @@ const SideBar = props => {
         <div className="cache-options">
           Cache Size:
           <select className="display-value" onChange={(x) => props.configureCache(1, parseInt(x.target.value), props.l1CacheInfo.blockSize, props.l1CacheInfo.associativity, props.l1CacheInfo.latency)}>
-            <option value={8} selected={props.l1CacheInfo.cacheSize === 8}>8 Bytes</option>
             <option value={16} selected={props.l1CacheInfo.cacheSize === 16}>16 Bytes</option>
             <option value={32} selected={props.l1CacheInfo.cacheSize === 32}>32 Bytes</option>
             <option value={64} selected={props.l1CacheInfo.cacheSize === 64}>64 Bytes</option>

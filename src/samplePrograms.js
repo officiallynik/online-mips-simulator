@@ -50,9 +50,9 @@ loop2:
 
 
 loop1:
-	lw $t6, 0($s0)
-
-	beq $t0, $t1, print
+    beq $t0, $t1, print
+    
+    lw $t6, 0($s0)
 	addi $t3, $t0, 1 
 
 	addi $s2, $s0, 4

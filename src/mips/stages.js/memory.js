@@ -19,7 +19,9 @@ const memory = (instr, cacheController, currentCycle) => {
         // const valDec = parseInt(val, 2)
 
         // console.log(addr, val, valDec)
-        instr.result = cacheController.readFromCache(addr, currentCycle)[0]
+        let result = cacheController.readFromCache(addr, currentCycle)
+        console.log(addr, result)
+        instr.result = result[0]
         processor.setRegister(instr.dest, instr.result)
     }
     else if (instr.operator === 'li' || instr.operator === 'lui') {

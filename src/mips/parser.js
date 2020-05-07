@@ -39,17 +39,20 @@ parser.parse = code => {
           // each val is of size 32 bits
           var val = parseInt(word).toString(2);
           const len = val.length;
-          for (let i = 0; i < 32 - len; i++) {
+          for (let i = 0; i < 32 - len && !isNaN(parseInt(val, 2)); i++) {
             val = "0" + val;
           }
           // console.log("Val: " + val)
+          // console.log(isNaN(parseInt(val, 2))).
           // console.log(parser.memPtr)
-          processor.memory[parser.memPtr] = val
+          if(!isNaN(parseInt(val, 2))){
+            processor.memory[parser.memPtr] = val
+            parser.memPtr += 1;
+          }
           // processor.memory[parser.memPtr + 1] = val.slice(8, 16);
           // processor.memory[parser.memPtr + 2] = val.slice(16, 24);
           // processor.memory[parser.memPtr + 3] = val.slice(24, 32);
 
-          parser.memPtr += 1;
         }
       });
     }
