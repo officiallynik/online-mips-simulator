@@ -27,10 +27,10 @@ class cacheController{
 
     searchInCacheL1(tag, index, offset){
         if(offset.length === 0) offset = '0'
-        let setStartBlk = parseInt(index, 2)*(this.nbLinesL1/Math.pow(2, index.toString().length))
+        let setStartBlk = this.indexBitsL1 === 0? 0 : parseInt(index, 2)*(this.nbLinesL1/Math.pow(2, this.indexBitsL1))
         // console.log("In L1")
-        // console.log(tag, index, offset, set)
-        for(let i=0; i<parseInt(this.nbLinesL1/Math.pow(2, index.toString(2).length)); i++){
+        // console.log(tag, index, offset, setStartBlk, this.nbLinesL1/Math.pow(2, this.indexBitsL1))
+        for(let i=0; i<parseInt(this.nbLinesL1/Math.pow(2, this.indexBitsL1)); i++){
             var fetchedTag = this.tagL1[setStartBlk + i]
             // console.log((set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2))
             if(tag === fetchedTag){
@@ -47,14 +47,14 @@ class cacheController{
         // console.log(tag, index, offset)
         // console.log(nbBlocks)
 
-        let setStartBlk = parseInt(index, 2)*(this.nbLinesL2/Math.pow(2, index.toString().length))
+        let setStartBlk = this.indexBitsL2 === 0? 0 : parseInt(index, 2)*(this.nbLinesL2/Math.pow(2, this.indexBitsL2))
         // console.log("StrtBlk")
         // console.log(setStartBlk)
         // console.log("NbBlocks")
         // console.log(this.nbLinesL2/Math.pow(2, index.toString(2).length))
         // // console.log("In L1")
         // console.log(tag, index, offset, set)
-        for(let i=0; i<parseInt(this.nbLinesL2/Math.pow(2, index.toString(2).length)); i++){
+        for(let i=0; i<parseInt(this.nbLinesL2/Math.pow(2, this.indexBitsL2)); i++){
             var fetchedTag = this.tagL2[setStartBlk + i]
             // console.log((set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (i*Math.pow(2, this.offsetBitsL1)) + parseInt(offset, 2))
             if(tag === fetchedTag){
@@ -81,14 +81,14 @@ class cacheController{
         if(typeof(offset) === "string" && offset.length === 0) offset = '0'
         // console.log(tag, index, offset)
         
-        let set = parseInt(index, 2)
+        let set = this.indexBitsL1 === 0? 0 : parseInt(index, 2)
         
-        let startBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length)))
+        let startBlk = (set*(this.nbLinesL1/Math.pow(2, this.indexBitsL1)))
 
         // console.log("StartBlk: ", startBlk)
         
         // if same tag is present
-        for(let i=startBlk; i<startBlk+this.nbLinesL1/Math.pow(2, index.toString(2).length) && offset!==null; i++){
+        for(let i=startBlk; i<startBlk+this.nbLinesL1/Math.pow(2, this.indexBitsL1) && offset!==null; i++){
             // console.log(this.tagL1[i])
             if(this.tagL1[i] === tag){
                 // console.log("writing to cache L1 only")
@@ -103,19 +103,19 @@ class cacheController{
         let i =  startBlk + 1
         // console.log("StartBlk: " + startBlk)
         let lruBlk = 0
-        while(i<this.nbLinesL1/Math.pow(2, index.toString(2).length) + startBlk){
+        while(i<this.nbLinesL1/Math.pow(2, this.indexBitsL1) + startBlk){
             if(this.cntL1[lruBlk+startBlk] > this.cntL1[i]){
                 lruBlk = i - startBlk
             }
             i++;
         }
         // console.log("lruBlk: " + lruBlk)
-        let blk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL1)) + (lruBlk*Math.pow(2, this.offsetBitsL1))
+        let blk = (set*(this.nbLinesL1/Math.pow(2, this.indexBitsL1))*Math.pow(2, this.offsetBitsL1)) + (lruBlk*Math.pow(2, this.offsetBitsL1))
         let evictedData = this.dataL1.splice(blk, data.length, ...data)
         // console.log("Evicted Data: ")
         // console.log(evictedData)
         // console.log(evictedData.some(value => typeof(parseInt(value, 2))==="number"))
-        let tagBlk = (set*(this.nbLinesL1/Math.pow(2, index.toString(2).length))) + lruBlk
+        let tagBlk = (set*(this.nbLinesL1/Math.pow(2, this.indexBitsL1))) + lruBlk
         if(evictedData.some(value => typeof(parseInt(value, 2))==="number")){
             let data = []
             evictedData.forEach(item => {
@@ -141,12 +141,12 @@ class cacheController{
         // console.log(tag, index, offset)
         // console.log(data)
 
-        let set = parseInt(index, 2)
-        let startBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length)))
+        let set = this.indexBitsL2 === 0? 0 : parseInt(index, 2)
+        let startBlk = (set*(this.nbLinesL2/Math.pow(2, this.indexBitsL2)))
         // console.log("StartBlk: ", startBlk)
         
         // if empty space or same tag is present
-        for(let i=startBlk; i<startBlk+this.nbLinesL2/Math.pow(2, index.toString(2).length); i++){
+        for(let i=startBlk; i<startBlk+this.nbLinesL2/Math.pow(2, this.indexBitsL2); i++){
             if(this.tagL2[i] === undefined || this.tagL2[i] === tag){
                 this.dataL2.splice(i*Math.pow(2, this.offsetBitsL2) + parseInt(offset, 2), data.length, ...data)
                 this.tagL2[i] = tag
@@ -159,16 +159,16 @@ class cacheController{
         let i =  startBlk + 1
         // console.log("StartBlk: " + startBlk)
         let lruBlk = 0
-        while(i<this.nbLinesL2/Math.pow(2, index.toString(2).length) + startBlk){
+        while(i<this.nbLinesL2/Math.pow(2, this.indexBitsL2) + startBlk){
             if(this.cntL2[lruBlk+startBlk] > this.cntL2[i]){
                 lruBlk = i - startBlk
             }
             i++;
         }
         // console.log("lruBlk: " + lruBlk)
-        let blk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length))*Math.pow(2, this.offsetBitsL2)) + (lruBlk*Math.pow(2, this.offsetBitsL2))
+        let blk = (set*(this.nbLinesL2/Math.pow(2, this.indexBitsL2))*Math.pow(2, this.offsetBitsL2)) + (lruBlk*Math.pow(2, this.offsetBitsL2))
         this.dataL2.splice(blk, data.length, ...data)
-        let tagBlk = (set*(this.nbLinesL2/Math.pow(2, index.toString(2).length))) + lruBlk
+        let tagBlk = (set*(this.nbLinesL2/Math.pow(2, this.indexBitsL2))) + lruBlk
         this.tagL2[tagBlk] = tag
         this.cntL2[tagBlk] = cycle
     }
