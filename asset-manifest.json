@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/online-mips-simulator/static/css/main.df090137.chunk.css",
+    "main.js": "/online-mips-simulator/static/js/main.95cb0a29.chunk.js",
+    "main.js.map": "/online-mips-simulator/static/js/main.95cb0a29.chunk.js.map",
+    "runtime-main.js": "/online-mips-simulator/static/js/runtime-main.b5d1b8ea.js",
+    "runtime-main.js.map": "/online-mips-simulator/static/js/runtime-main.b5d1b8ea.js.map",
+    "static/js/2.17fcb555.chunk.js": "/online-mips-simulator/static/js/2.17fcb555.chunk.js",
+    "static/js/2.17fcb555.chunk.js.map": "/online-mips-simulator/static/js/2.17fcb555.chunk.js.map",
+    "index.html": "/online-mips-simulator/index.html",
+    "precache-manifest.c628ed1f7fd6b2365344c468d8bae31d.js": "/online-mips-simulator/precache-manifest.c628ed1f7fd6b2365344c468d8bae31d.js",
+    "service-worker.js": "/online-mips-simulator/service-worker.js",
+    "static/css/main.df090137.chunk.css.map": "/online-mips-simulator/static/css/main.df090137.chunk.css.map",
+    "static/js/2.17fcb555.chunk.js.LICENSE.txt": "/online-mips-simulator/static/js/2.17fcb555.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b5d1b8ea.js",
+    "static/js/2.17fcb555.chunk.js",
+    "static/css/main.df090137.chunk.css",
+    "static/js/main.95cb0a29.chunk.js"
+  ]
+}
