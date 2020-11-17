@@ -1,6 +1,6 @@
 # MIPS Simulator Build Using React and Javascript
 
-Online link: https://mips-online.herokuapp.com/
+Online link: https://officiallynik.github.io/online-mips-simulator
 
 #### How to use it locally?
 1. download the zip
